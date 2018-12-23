@@ -1,0 +1,47 @@
+.tiaomaImg{
+    margin: 0 auto;
+    width: 60px;
+    height: 70px;
+}
+
+.imgDiv{
+   padding: 10px 0 30px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.a{
+    color: #000;
+}
+
+.login-box .am-list-body:before{
+     display: none!important;
+ }
+
+.login-box .am-list-body:after{
+    display: none!important;
+}
+
+.my-radio {
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+
+.yzm{
+    background-color:#ef813a;
+    color:#fff;
+    float: right;
+    bottom: 38px;
+}
+
+.iconImg{
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+
+.iconImg img{
+    width: 30px;
+    height: 30px;
+}
