@@ -55,8 +55,8 @@ class Mine extends React.Component {
             electricity:null,
             water:null,
             hotWater:null,
-            electricityMoney:0,
             padd:100,
+            electricityMoney:0,
             waterMoney:0,
             hotWaterMoney:0,
             damages:null,
@@ -128,6 +128,12 @@ class Mine extends React.Component {
 
                         this.setState({
                             data:response.data.data,
+                            electricityMoney:0,
+                            waterMoney:0,
+                            hotWaterMoney:0,
+                            damages:null,
+                            note:'',
+                            roomImg:'',
                             flag:this.roomNo==this.state.roomNo?true:false
                         })
                     }
@@ -289,7 +295,7 @@ class Mine extends React.Component {
         }else {
 
             this.setState({
-                flag:this.roomNo==this.state.roomNo?true:false
+                flag:true
             },()=>{
                 axios.post(`/employee/saveCheckRoom`, {
                     hotelNo:this.props.reduxData.hotelNo,
@@ -465,7 +471,7 @@ class Mine extends React.Component {
                                         <View style={styles.a}>
                                             <Text style={{flex:1}}>查房时间:</Text>
                                             <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{moment(roomInfo.createTime).format("YYYY-MM-DD hh:mm:ss")}</Text>
+                                                <Text style={{flex:1}}>{moment(roomInfo.createTime).format("YYYY-MM-DD HH:mm:ss")}</Text>
                                             </View>
                                         </View>
 
@@ -825,7 +831,7 @@ class Mine extends React.Component {
 
                                             <View style={[styles.aaa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
                                                 <Text>{item.userName}</Text>
-                                                <Text  style={{marginTop:5,}}>{moment(item.createTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                                <Text  style={{marginTop:5,}}>{moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                             </View>
 
 

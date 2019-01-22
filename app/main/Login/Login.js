@@ -141,7 +141,7 @@ export default class Login extends Component {
         if(phone.trim()==''){
             Toast.info('手机号不能为空',1);
             return
-        }else if(phone.trim()==''){
+        }else if(password.trim()==''){
             Toast.info('密码不能为空',1);
             return
         }else{

@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {FlatList,View,DeviceEventEmitter, ScrollView,Text, TouchableHighlight, TextInput,Image, Modal, StyleSheet,Platform} from 'react-native';
+import {Alert,FlatList,View,DeviceEventEmitter, ScrollView,Text, TouchableHighlight, TextInput,Image, Modal, StyleSheet,Platform} from 'react-native';
 
 import Dimensions from "Dimensions";
 import axios from "../../axios";
@@ -7,7 +7,7 @@ import {DatePicker,Toast} from 'antd-mobile'
 import shaixuan from "../HomePage/style/shaixuan.png";
 import s1 from "../HomePage/style/234.png";
 import close from "../HomePage/style/close.png";
-import moment from "moment/moment";
+import moment from "moment";
 import {bindActionCreators} from "redux";
 import {setHotelNo} from "../../components/active/reducer";
 import {connect} from "react-redux";
@@ -170,6 +170,7 @@ class Mine extends React.Component {
 
     componentWillMount(){
         
+
     }
 
     screening = ()=>{
@@ -180,13 +181,22 @@ class Mine extends React.Component {
     }
 
 
+    submitGetMeter = ()=>{
+        this.setState({
+            modalVisible: false,
+        },()=>{
+            this.onRefresh()
+        })
+    }
+
+
     changeDate1=(date)=>{
 
         let {date1,date2} = this.state
 
         let flag = moment(date).isBefore(date2);
         if(flag){
-            this.setState({date1:date},()=>{this.getAll();this._showLoading()})
+            this.setState({date1:date})
         }else {
             this.setState({
                 toast:true,
@@ -215,7 +225,7 @@ class Mine extends React.Component {
 
 
         if(flag){
-            this.setState({date2:date},()=>{this.getAll();this._showLoading()})
+            this.setState({date2:date})
         }else {
             this.setState({
                 toast:true,
@@ -279,6 +289,9 @@ class Mine extends React.Component {
                             electricity:0,
                             water:0,
                             hotWater:0,
+                            elePrice:0,
+                            waterPrice:0,
+                            hotWaterPrice:0,
                         })
                     }
 
@@ -404,9 +417,48 @@ class Mine extends React.Component {
     }
 
 
+    comfirmSelected = ()=>{
+
+        let {lastEle,electricity,lastWater,water,lastHotWater,hotWater} = this.state;
+
+
+        axios.post(`/employee/saveMeter`, {
+            hotelNo:this.props.reduxData.hotelNo,
+            roomNo:this.state.roomNo,
+            electricMoney:electricity-0,
+            lastElectricMoney:lastEle-0,
+            waterMoney:water-0,
+            lastWaterMoney:lastWater-0,
+            hotWaterMoney:hotWater-0,
+            lastHotWaterMoney:lastHotWater-0,
+
+
+        })
+            .then((response) =>{
+                console.log(response);
+
+                Toast.info(response.data.code==0?'提交成功':response.data.message,1)
+
+                this.roomNo=this.state.roomNo;
+                this.setState({
+                    flag:response.data.code==0?true:false
+                })
+
+
+
+
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
+
+    cancelSelected = ()=>{}
+
     submitAll = ()=>{
 
-        let {data,lastEle,electricity,lastWater,water,lastHotWater,hotWater} = this.state;
+        let {data} = this.state;
 
         if(!this.aa){
             Toast.info('请确定填写的房间号',1);
@@ -417,42 +469,25 @@ class Mine extends React.Component {
         }else {
 
             this.setState({
-                flag:this.roomNo==this.state.roomNo?true:false
+                flag:true
             },()=>{
-                axios.post(`/employee/saveMeter`, {
-                    hotelNo:this.props.reduxData.hotelNo,
-                    roomNo:this.state.roomNo,
-                    electricMoney:electricity-0,
-                    lastElectricMoney:lastEle-0,
-                    waterMoney:water-0,
-                    lastWaterMoney:lastWater-0,
-                    hotWaterMoney:hotWater-0,
-                    lastHotWaterMoney:lastHotWater-0,
 
+                Alert.alert('确定抄表？','确定抄表',
+                    [
+                        {text:"取消", onPress:this.cancelSelected},
+                        {text:"确认", onPress:this.comfirmSelected}
+                    ],
+                    { cancelable: false }
+                );
 
-                })
-                    .then((response) =>{
-                        console.log(response);
-
-                        Toast.info(response.data.code==0?'提交成功':response.data.message,1)
-
-                        this.roomNo=this.state.roomNo;
-                        this.setState({
-                            flag:response.data.code==0?true:false
-                        })
-
-
-
-
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
             })
 
 
         }
     }
+
+
+
 
 
 
@@ -618,7 +653,7 @@ class Mine extends React.Component {
                                                     <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
                                                         <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
                                                             alignItems:"center"
-                                                        }} onPress={this.getMeter}>
+                                                        }} onPress={this.submitGetMeter}>
                                                             <Text
                                                                 style={{fontSize:16,textAlign:"center",color:"#fff"}}>
                                                                 确定
@@ -671,7 +706,7 @@ class Mine extends React.Component {
                                                     <View style={styles.a}>
                                                         <Text style={styles.f}>查房时间:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
-                                                            <Text style={{flex:1}}>{moment(roomInfo.createTime).format("YYYY-MM-DD hh:mm:ss")}</Text>
+                                                            <Text style={{flex:1}}>{moment(roomInfo.createTime).format("YYYY-MM-DD HH:mm:ss")}</Text>
                                                         </View>
                                                     </View>
 
@@ -865,7 +900,7 @@ class Mine extends React.Component {
                                     <View style={{flex:1,}}><Text >上次抄表时间:</Text></View>
                                     <View style={{flex:3}}>
                                         <View>
-                                            <Text>{moment(data.electricTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                            <Text>{moment(data.electricTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                         </View>
                                     </View>
 
@@ -941,7 +976,7 @@ class Mine extends React.Component {
                                     <View style={{flex:1,}}><Text >上次抄表时间:</Text></View>
                                     <View style={{flex:3}}>
                                         <View>
-                                            <Text>{moment(data.waterTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                            <Text>{moment(data.waterTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                         </View>
                                     </View>
 
@@ -1017,7 +1052,7 @@ class Mine extends React.Component {
                                     <View style={{flex:1,}}><Text >上次抄表时间:</Text></View>
                                     <View style={{flex:3}}>
                                         <View>
-                                            <Text>{moment(data.hotWaterTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                            <Text>{moment(data.hotWaterTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                         </View>
                                     </View>
 
@@ -1100,7 +1135,7 @@ class Mine extends React.Component {
                                                 }} onPress={this.noRepeat }>
                                                     <Text
                                                         style={{fontSize:16,textAlign:"center",color:"#000"}}>
-                                                        确定
+                                                        发送账单
                                                     </Text>
                                                 </TouchableHighlight>
                                             </LinearGradient>
@@ -1180,7 +1215,7 @@ class Mine extends React.Component {
 
                                             <View style={[styles.aaa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
                                                 <Text>{item.userName}</Text>
-                                                <Text  style={{marginTop:5,}}>{moment(item.createTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                                <Text  style={{marginTop:5,}}>{moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                             </View>
 
 

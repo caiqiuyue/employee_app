@@ -33,6 +33,18 @@ class App extends Component {
         CodePush.allowRestart();//在加载完了可以允许重启
 
         JPushModule.initPush();
+
+
+        if (!__DEV__) {
+            global.console = {
+                info: () => {},
+                log: () => {},
+                warn: () => {},
+                debug: () => {},
+                error: () => {}
+            };
+        }
+
     }
 
     render() {

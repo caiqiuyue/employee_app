@@ -124,46 +124,6 @@ class A extends Component {
 
     }
 
-    //销售数据
-    salesData = ()=>{
-        let {date1,date2} = this.state
-        axios.post(`/analyze/salesData`, {
-            hotelNo:this.props.reduxData.hotelNo,
-            beginDate:moment(date1).format('YYYY-MM-DD'),
-
-        })
-            .then((response) =>{
-                console.log(response,'销售数据');
-                this.setState({
-                    salesData:response.data
-                })
-
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-
-    }
-
-    //可售房源
-    roomData = ()=>{
-        let {date1,date2} = this.state
-        axios.post(`/analyze/roomData`, {
-            hotelNo:this.props.reduxData.hotelNo,
-            beginDate:moment(date1).format('YYYY-MM-DD'),
-
-        })
-            .then((response) =>{
-                console.log(response,'可售房源');
-                this.setState({
-                    roomData:response.data
-                })
-
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-    }
 
     //经营数据
     manageData = ()=>{
@@ -211,8 +171,6 @@ class A extends Component {
         });
 
         this.incomeData();
-        this.salesData();
-        this.roomData();
         this.manageData();
 
 
@@ -298,8 +256,6 @@ class A extends Component {
 
 
     }
-
-
 
 
     render(){
@@ -514,6 +470,11 @@ class A extends Component {
                                         <Text style={styles.bbb}>违约率</Text>
                                         <Text style={styles.ccc}>{manageData.map.breachRate}%</Text>
                                     </View>
+
+                                    <View style={[styles.aaa]}>
+                                        <Text style={styles.bbb}>REVPER</Text>
+                                        <Text style={styles.ccc}>{manageData.map.revper}元</Text>
+                                    </View>
                                 </View>
 
 
@@ -531,107 +492,114 @@ class A extends Component {
 
                             changeMsg=='销售数据'?(
 
-                                salesData&&salesData.code==0?
+                                manageData&&manageData.code==0?
 
                                 <View style={{padding:10}}>
 
                                     <View style={{marginTop:10,flexDirection:"row",flexWrap:"wrap",justifyContent:'space-between'}}>
                                         <View style={styles.aaa}>
                                             <Text style={styles.bbb}>上户数</Text>
-                                            <Text style={styles.ccc}>{salesData.map.visitCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.visitCount}</Text>
                                         </View>
 
                                         <View style={styles.aaa}>
-                                            <Text style={styles.bbb}>预定数</Text>
-                                            <Text style={styles.ccc}>{salesData.map.orderCount}</Text>
+                                            <Text style={styles.bbb}>当日预定数</Text>
+                                            <Text style={styles.ccc}>{manageData.map.orderCount}</Text>
                                         </View>
 
                                         <View style={[styles.aaa,{marginRight:0}]}>
                                             <Text style={styles.bbb}>签约数</Text>
-                                            <Text style={styles.ccc}>{salesData.map.checkinCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.checkinCount}</Text>
                                         </View>
 
                                         <View style={styles.aaa}>
                                             <Text style={styles.bbb}>成交率</Text>
-                                            <Text style={styles.ccc}>{salesData.map.closeRate}%</Text>
+                                            <Text style={styles.ccc}>{manageData.map.closeRate}%</Text>
                                         </View>
 
                                         <View style={styles.aaa}>
                                             <Text style={styles.bbb}>招租率</Text>
-                                            <Text style={styles.ccc}>{salesData.map.rentRate}%</Text>
+                                            <Text style={styles.ccc}>{manageData.map.rentRate}%</Text>
                                         </View>
 
-                                        <View style={[styles.aaa,{marginRight:0}]}>
+                                        <View style={[styles.aaa]}>
                                             <Text style={styles.bbb}>取消率</Text>
-                                            <Text style={styles.ccc}>{salesData.map.cancelRate}%</Text>
+                                            <Text style={styles.ccc}>{manageData.map.cancelRate}%</Text>
                                         </View>
+
+                                        <View style={[styles.aaa]}>
+                                            <Text style={styles.bbb}>累计与定数</Text>
+                                            <Text style={styles.ccc}>{manageData.map.totalOrder}</Text>
+                                        </View>
+
+
                                     </View>
 
 
                                 </View>
-                                    :salesData&&salesData.code==1?
+                                    :manageData&&manageData.code==1?
 
                                     <View style={{marginTop:30,alignItems:"center"}}>
-                                        <Text>{salesData.message}</Text>
+                                        <Text>{manageData.message}</Text>
                                     </View>:
                                     null
 
 
                                 ):(
 
-                                roomData&&roomData.code==0?
+                                manageData&&manageData.code==0?
                                 <View style={{padding:10}}>
 
                                     <View style={{marginTop:10,flexDirection:"row",flexWrap:"wrap",justifyContent:'space-between'}}>
                                         <View style={styles.aaa}>
                                             <Text style={styles.bbb}>在住数</Text>
-                                            <Text style={styles.ccc}>{roomData.map.liveCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.liveCount}</Text>
                                         </View>
 
                                         <View style={styles.aaa}>
                                             <Text style={styles.bbb}>空置数</Text>
-                                            <Text style={styles.ccc}>{roomData.map.emptyCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.emptyCount}</Text>
                                         </View>
 
                                         <View style={[styles.aaa,{marginRight:0}]}>
                                             <Text style={styles.bbb}>停用数</Text>
-                                            <Text style={styles.ccc}>{roomData.map.disableCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.disableCount}</Text>
                                         </View>
 
                                         <View style={styles.aaa}>
                                             <Text style={styles.bbb}>占用数</Text>
-                                            <Text style={styles.ccc}>{roomData.map.occupyCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.occupyCount}</Text>
                                         </View>
 
                                         <View style={styles.aaa}>
                                             <Text style={styles.bbb}>可销售数</Text>
-                                            <Text style={styles.ccc}>{roomData.map.saleCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.saleCount}</Text>
                                         </View>
 
                                         <View style={[styles.aaa,{marginRight:0}]}>
                                             <Text style={styles.bbb}>总房数</Text>
-                                            <Text style={styles.ccc}>{roomData.map.totalCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.totalCount}</Text>
                                         </View>
 
                                         <View style={[styles.aaa,{marginRight:0}]}>
                                             <Text style={styles.bbb}>预离退房</Text>
                                             <Text style={styles.ccc}>(15天内)</Text>
-                                            <Text style={styles.ccc}>{roomData.map.leaveCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.leaveCount}</Text>
                                         </View>
 
                                         <View style={[styles.aaa,{marginRight:0}]}>
                                             <Text style={styles.bbb}>申请转租</Text>
 
-                                            <Text style={styles.ccc}>{roomData.map.transferCount}</Text>
+                                            <Text style={styles.ccc}>{manageData.map.transferCount}</Text>
                                         </View>
                                     </View>
 
 
                                 </View>
-                                    :roomData&&roomData.code==1?
+                                    :manageData&&manageData.code==1?
 
                                     <View style={{marginTop:30,alignItems:"center"}}>
-                                        <Text>{roomData.message}</Text>
+                                        <Text>{manageData.message}</Text>
                                     </View>:
                                     null
 
