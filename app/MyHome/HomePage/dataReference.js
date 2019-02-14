@@ -62,6 +62,7 @@ class A extends Component {
             modalVisible:false,
 
             date1:new Date(moment(new Date()).subtract(1, 'days')),
+            date2:new Date(moment(new Date()).subtract(1, 'days')),
 
 
         };
@@ -105,6 +106,7 @@ class A extends Component {
         axios.post(`/analyze/incomeData`, {
             hotelNo:this.props.reduxData.hotelNo,
             beginDate:moment(date1).format('YYYY-MM-DD'),
+            endDate:moment(date2).format('YYYY-MM-DD'),
         })
             .then((response) =>{
                 console.log(response,'收银数据');
@@ -132,6 +134,7 @@ class A extends Component {
         axios.post(`/analyze/manageData`, {
             hotelNo:this.props.reduxData.hotelNo,
             beginDate:moment(date1).format('YYYY-MM-DD'),
+            endDate:moment(date2).format('YYYY-MM-DD'),
 
         })
             .then((response) =>{
@@ -206,7 +209,33 @@ class A extends Component {
 
 
     changeDate1=(date)=>{
-        this.setState({date1:date},()=>{this.getAll();this._showLoading()})
+
+        let {date1,date2} = this.state
+
+        let flag = moment(date).isBefore(date2);
+
+
+        if(flag){
+            this.setState({date1:date},()=>{this.getAll();this._showLoading()})
+        }else {
+            Toast.info('开始日期不能比结束日期小')
+        }
+
+
+    }
+
+    changeDate2=(date)=>{
+
+        let {date1,date2} = this.state
+
+        let flag = moment(date1).isBefore(date);
+
+        if(flag){
+            this.setState({date2:date},()=>{this.getAll();this._showLoading()})
+        }else {
+            Toast.info('结束日期不能比开始日期小')
+        }
+
     }
 
     wxShare = ()=>{
@@ -223,9 +252,7 @@ class A extends Component {
             })
 
 
-            console.log(encodeURI(`http://www.fangapo.cn/data.html?hotelName=${aaa[0].hotelName}&&date=${moment(this.state.date1).format('YYYY-MM-DD')}&&hotelNo=${this.props.reduxData.hotelNo}&&tokenKey=${this.tokenKey}`));
-
-            let a = encodeURI(`http://www.fangapo.cn/data.html?hotelName=${aaa[0].hotelName}&&date=${moment(this.state.date1).format('YYYY-MM-DD')}&&hotelNo=${this.props.reduxData.hotelNo}&&tokenKey=${this.tokenKey}`)
+            let a = encodeURI(`http://www.fangapo.cn/data.html?hotelName=${aaa[0].hotelName}&&date=${moment(this.state.date1).format('YYYY-MM-DD')}&&date2=${moment(this.state.date2).format('YYYY-MM-DD')}&&hotelNo=${this.props.reduxData.hotelNo}&&tokenKey=${this.tokenKey}`)
 
 
 
@@ -288,7 +315,7 @@ class A extends Component {
                     <View>
 
                         <View style={{flexDirection:'row',padding:5,justifyContent:"space-between"}}>
-                            <View style={{width:'50%'}}>
+                            <View style={{width:'40%'}}>
                                 <DatePicker
                                     extra="请选择日期"
                                     format={val => moment(val).format("YYYY-MM-DD")}
@@ -297,6 +324,21 @@ class A extends Component {
                                     maxDate={maxDate2}
                                     // onChange={date1 => {this.changeDate1(date1)}}
                                     onOk={date1 => {this.changeDate1(date1)}}
+                                    // onOk={date1 => this.setState({date1},()=>{this.getAll()})}
+                                >
+                                    <RoomInfo></RoomInfo>
+                                </DatePicker>
+                            </View>
+
+                            <View style={{width:'40%'}}>
+                                <DatePicker
+                                    extra="请选择日期"
+                                    format={val => moment(val).format("YYYY-MM-DD")}
+                                    value={this.state.date2}
+                                    mode="date"
+                                    maxDate={maxDate2}
+                                    // onChange={date1 => {this.changeDate1(date1)}}
+                                    onOk={date1 => {this.changeDate2(date1)}}
                                     // onOk={date1 => this.setState({date1},()=>{this.getAll()})}
                                 >
                                     <RoomInfo></RoomInfo>
@@ -472,8 +514,18 @@ class A extends Component {
                                     </View>
 
                                     <View style={[styles.aaa]}>
-                                        <Text style={styles.bbb}>REVPER</Text>
+                                        <Text style={styles.bbb}>REVPAR</Text>
                                         <Text style={styles.ccc}>{manageData.map.revper}元</Text>
+                                    </View>
+
+                                    <View style={[styles.aaa]}>
+                                        <Text style={styles.bbb}>正常退房数</Text>
+                                        <Text style={styles.ccc}>{manageData.map.checkOutNum}</Text>
+                                    </View>
+
+                                    <View style={[styles.aaa]}>
+                                        <Text style={styles.bbb}>违约退房数</Text>
+                                        <Text style={styles.ccc}>{manageData.map.checkoutBreach}</Text>
                                     </View>
                                 </View>
 
@@ -503,7 +555,7 @@ class A extends Component {
                                         </View>
 
                                         <View style={styles.aaa}>
-                                            <Text style={styles.bbb}>当日预定数</Text>
+                                            <Text style={styles.bbb}>预定数</Text>
                                             <Text style={styles.ccc}>{manageData.map.orderCount}</Text>
                                         </View>
 
@@ -528,7 +580,7 @@ class A extends Component {
                                         </View>
 
                                         <View style={[styles.aaa]}>
-                                            <Text style={styles.bbb}>累计与定数</Text>
+                                            <Text style={styles.bbb}>累计预定数</Text>
                                             <Text style={styles.ccc}>{manageData.map.totalOrder}</Text>
                                         </View>
 

@@ -61,6 +61,7 @@ class GoodSelect extends Component {
 
             ],
             rentList:[],
+            repairImgs:[],
             serverList:[],
             adviceList:[],
             refreshing:false,
@@ -420,16 +421,18 @@ class GoodSelect extends Component {
         // console.log(item);
 
         this.setState({
-            modal:i==1&&item.status=='0'?'接受':i==1&&item.status=='1'?'确定':'回复',
+            modal:i==1 && item.status=='0' ? '接受' : i==1&&item.status=='1' ? '确定':'回复',
             serverItem:item,
             date:null,
             content:'',
+            butlerMsg:'',
         },()=>{
             this._setModalVisible(true);
             console.log(this.state.serverItem,'serverItem');
         });
 
     };
+
 
 
     //确定接受
@@ -510,6 +513,7 @@ class GoodSelect extends Component {
     reply=()=>{
         let {serverItem,content} = this.state;
 
+        console.log(content,'contentcontent');
 
         if(content.trim()==''){
             alert('请填写回复内容')
@@ -539,6 +543,14 @@ class GoodSelect extends Component {
         })
     }
 
+
+    repairImg = (item)=>{
+        this.setState({
+            repairImgs:item.split(','),
+            modal:'111',
+            modalVisible:true
+        })
+    }
 
     render(){
 
@@ -700,8 +712,8 @@ class GoodSelect extends Component {
 
                                         </View>
                                     </View>
-                                :
-                                        <View>
+                                :this.state.modal=='回复'?
+                                    <View>
                                             <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
 
                                                 <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>回复</Text></View>
@@ -748,6 +760,33 @@ class GoodSelect extends Component {
 
                                             </View>
                                         </View>
+                                :   <View>
+                                        <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
+
+                                            <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>问题图片</Text></View>
+
+                                            <TouchableHighlight underlayColor={"#fff"} onPress={()=>{this._setModalVisible(false)} } style={{}}>
+                                                <Image style={{height:30,width:30}} source={close}/>
+                                            </TouchableHighlight>
+
+
+                                        </View>
+
+                                        <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+
+                                            {
+                                                this.state.repairImgs.map((item,index)=>
+                                                    <View key={index} style={{alignItems:"center",justifyContent:"center"}} >
+                                                        <Image style={{height:Dimensions.get('window').height-200,width:"100%",resizeMode:"stretch"}}
+                                                               source={{uri:item}}
+                                                        />
+                                                    </View>
+                                                )
+                                            }
+
+                                        </ScrollView>
+                                    </View>
+
                                 }
 
 
@@ -849,6 +888,7 @@ class GoodSelect extends Component {
                                                     <Text  style={{fontWeight:"bold"}}>{item.content}</Text>
                                                     {item.evaluate?(<Text style={{color:"red"}}>评价内容:{item.evaluate}</Text>):null}
                                                     {item.userComplete?(<Text style={{color:"blue"}}>{item.userComplete}管家留言:{item.butlerMsg}</Text>):null}
+                                                    {(item.type!=1 &&item.repairImg)?(<TouchableHighlight onPress={()=>{this.repairImg(item.repairImg)}}><Text style={{color:"green",textDecorationLine:"underline"}}>查看问题图片</Text></TouchableHighlight>):null}
 
                                                 </View>
 
