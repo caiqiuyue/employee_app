@@ -5,7 +5,7 @@ import Dimensions from "Dimensions";
 import axios from "../../axios";
 import {DatePicker,Toast} from 'antd-mobile'
 import shaixuan from "../HomePage/style/shaixuan.png";
-import s1 from "../HomePage/style/234.png";
+import s1 from "../HomePage/style/sanjiao.png";
 import close from "../HomePage/style/close.png";
 import moment from "moment";
 import {bindActionCreators} from "redux";
@@ -17,7 +17,7 @@ const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
 
-            <View style={{width:"100%",flexDirection:"row",backgroundColor:"#ccc",borderRadius:5,overflow:'hidden',padding:10}}>
+            <View style={{width:"100%",flexDirection:"row",borderColor:"#ccc",borderWidth:1,borderRadius:5,overflow:'hidden',padding:10}}>
                 <View style={{flex:3,}}><Text>{props.extra}</Text></View>
                 <View style={{flex:1,alignItems:"center",justifyContent:"center",}}><Image style={{height:10,width:15}} source={s1}/></View>
             </View>
@@ -590,7 +590,7 @@ class Mine extends React.Component {
                                                     <View style={[styles.b,{flex:3}]}>
                                                         <TextInput
                                                             placeholder={"房间号"}
-                                                            style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                            style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                             underlineColorAndroid="transparent"
                                                             onChangeText={(screenRoomNo) => this.setState({screenRoomNo})}
                                                         >

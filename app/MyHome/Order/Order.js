@@ -596,7 +596,6 @@ class GoodSelect extends Component {
                 </View>
 
 
-
                 <View>
 
                     <Modal
@@ -804,7 +803,6 @@ class GoodSelect extends Component {
 
 
                 </View>
-
 
 
                 <View style={{borderTopColor:"#7ebef9",borderTopWidth:1,flexDirection:"row",justifyContent:"space-around"}}>

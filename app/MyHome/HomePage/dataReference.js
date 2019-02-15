@@ -4,7 +4,7 @@ import {
     Modal,
     Linking, Alert
 } from 'react-native';
-import s1 from "./style/234.png";
+import s1 from "./style/sanjiao.png";
 import share from "./style/share.png";
 import axios from "../../axios";
 import moment from "moment";
@@ -20,7 +20,7 @@ const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
 
-            <View style={{width:"100%",flexDirection:"row",backgroundColor:"#ccc",borderRadius:5,overflow:'hidden',padding:5}}>
+            <View style={{width:"100%",flexDirection:"row",borderColor:"#ccc",borderWidth:1,borderRadius:5,overflow:'hidden',padding:5}}>
                 <View style={{flex:3,}}><Text>{props.extra}</Text></View>
                 <View style={{flex:1,alignItems:"center",justifyContent:"center",}}><Image style={{height:10,width:15}} source={s1}/></View>
             </View>

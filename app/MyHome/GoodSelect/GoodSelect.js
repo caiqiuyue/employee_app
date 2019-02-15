@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 
 import close from "../HomePage/style/close.png";
-import s1 from "../HomePage/style/234.png";
+import s1 from "../HomePage/style/sanjiao.png";
 import topBg from "../HomePage/style/topBg.png";
 import add from "./style/add.png";
 
@@ -25,18 +25,13 @@ const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
 
-            <View style={{width:"100%",flexDirection:"row",backgroundColor:"#ccc",borderRadius:5,overflow:'hidden',padding:10}}>
+            <View style={{width:"100%",flexDirection:"row",borderColor:"#ccc",borderWidth:1,borderRadius:5,overflow:'hidden',padding:10}}>
                 <View style={{flex:3,}}><Text>{props.extra}</Text></View>
                 <View style={{flex:1,alignItems:"center",justifyContent:"center",}}><Image style={{height:10,width:15}} source={s1}/></View>
             </View>
         </TouchableHighlight>
     )
 };
-
-
-
-
-
 
 
  class GoodSelect extends Component {
@@ -220,6 +215,7 @@ const RoomInfo = props => {
         };
 
         this.rentPolicyArr = [];
+        this.disabled=false;
     }
 
 
@@ -875,7 +871,6 @@ const RoomInfo = props => {
 
                     if(!_item.roomNo){
 
-
                         ccc[0] = roomList.length>0?roomList[0].value:'';
 
                     }else {
@@ -886,7 +881,7 @@ const RoomInfo = props => {
                             label:_item.roomNo,
                         }
 
-                        roomList.push(c)
+                        roomList.push(c);
 
                     }
 
@@ -1021,6 +1016,7 @@ const RoomInfo = props => {
 
     //添加按钮
     addCustomer=(type, item = {})=>{
+        this.disabled=false
         console.log(item)
 
         let {dateStatus} = this.state;
@@ -1028,6 +1024,12 @@ const RoomInfo = props => {
         dateStatus.map((_item)=>{
             _item.flag = false
         });
+
+
+        if(item.roomNo){
+            this.disabled=true;
+        }
+
         this.setState(
             {
                 phone: item.phoneNo || "",
@@ -1884,7 +1886,7 @@ const RoomInfo = props => {
                                                 <View style={[styles.b,{flex:3}]}>
                                                     <TextInput
                                                         placeholder={'姓名'}
-                                                        style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                        style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                         underlineColorAndroid="transparent"
                                                         onChangeText={(name) => this.setState({username:name})}
                                                     >
@@ -1897,7 +1899,7 @@ const RoomInfo = props => {
                                                 <View style={[styles.b,{flex:3}]}>
                                                     <TextInput
                                                         placeholder={'手机号'}
-                                                        style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                        style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                         underlineColorAndroid="transparent"
                                                         onChangeText={(phone) => this.setState({phone:phone})}
                                                     >
@@ -2099,7 +2101,7 @@ const RoomInfo = props => {
                                                 <View style={[styles.b,{flex:3}]}>
                                                     <TextInput
                                                         placeholder={'备注'}
-                                                        style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                        style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                         underlineColorAndroid="transparent"
                                                         onChangeText={(name) => this.setState({note:name})}
                                                     >
@@ -2198,7 +2200,7 @@ const RoomInfo = props => {
                                                                 <TextInput
                                                                     placeholder={this.state.username?this.state.username:'姓名'}
                                                                     // value={this.state.username}
-                                                                    style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
                                                                     onChangeText={(name) => this.setState({username:name})}
                                                                 >
@@ -2211,7 +2213,7 @@ const RoomInfo = props => {
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={this.state.phone?this.state.phone:'手机号'}
-                                                                    style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
                                                                     value={this.state.phone}
                                                                     onChangeText={(phone) => this.setState({phone:phone})}
@@ -2275,6 +2277,7 @@ const RoomInfo = props => {
                                                                     data={roomtypeList}
                                                                     cols={1}
                                                                     value={roomtype}
+                                                                    disabled={this.disabled}
                                                                     extra='请选择房型'
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {console.log(data);this.setState({roomtype:data},()=>{this.getEnableRoom()})}}
@@ -2299,6 +2302,7 @@ const RoomInfo = props => {
                                                                     cols={1}
                                                                     value={room}
                                                                     extra='请选择房间'
+                                                                    disabled={this.disabled}
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {this.setState({room:data})}}
                                                                     onOk={data => {this.setState({room:data})}}
@@ -2425,7 +2429,7 @@ const RoomInfo = props => {
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={'订金'}
-                                                                    style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
                                                                     onChangeText={(name) => this.setState({deposit:name})}
 
@@ -2440,7 +2444,7 @@ const RoomInfo = props => {
                                                                 <TextInput
                                                                     placeholder={'备注'}
                                                                     multiline={true}
-                                                                    style={{minWidth:'100%',height:100,padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                                    style={{minWidth:'100%',height:100,padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
                                                                     onChangeText={(name) => this.setState({note:name})}
 
@@ -2595,6 +2599,7 @@ const RoomInfo = props => {
                                                                     cols={1}
                                                                     value={roomtype}
                                                                     extra='请选择房型'
+                                                                    disabled={this.disabled}
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {this.setState({roomtype:data},()=>{this.getEnableRoom()})}}
                                                                     onOk={data => {this.setState({roomtype:data},()=>{this.getEnableRoom()})}}
@@ -2618,6 +2623,7 @@ const RoomInfo = props => {
                                                                     cols={1}
                                                                     value={room}
                                                                     extra='请选择房间'
+                                                                    disabled={this.disabled}
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {this.setState({room:data})}}
                                                                     onOk={data => {this.setState({room:data})}}
@@ -2734,7 +2740,7 @@ const RoomInfo = props => {
                                                                 <TextInput
                                                                     placeholder={'备注'}
                                                                     multiline={true}
-                                                                    style={{minWidth:'100%',height:100,padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                                    style={{minWidth:'100%',height:100,padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
                                                                     onChangeText={(name) => this.setState({note:name})}
                                                                     // onFocus={this.focus}
@@ -2750,7 +2756,7 @@ const RoomInfo = props => {
                                                                 <TextInput
                                                                     placeholder={this.state.username?this.state.username:'姓名'}
                                                                     // value={this.state.username}
-                                                                    style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
                                                                     onChangeText={(name) => this.setState({username:name})}
                                                                 >
@@ -2767,7 +2773,7 @@ const RoomInfo = props => {
                                                                 <View style={{flex:4}}>
                                                                     <TextInput
                                                                         placeholder={this.state.phone?this.state.phone:'手机号'}
-                                                                        style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5}}
+                                                                        style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5}}
                                                                         underlineColorAndroid="transparent"
                                                                         value={this.state.phone}
                                                                         onChangeText={(phone) => this.setState({phone:phone})}
@@ -2791,7 +2797,7 @@ const RoomInfo = props => {
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <TextInput
                                                                         placeholder={'姓名'}
-                                                                        style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                                        style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                         underlineColorAndroid="transparent"
                                                                         onChangeText={(name) => this.setState({username2:name})}
                                                                     >
@@ -2806,7 +2812,7 @@ const RoomInfo = props => {
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <TextInput
                                                                         placeholder={'手机号'}
-                                                                        style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                                        style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                         underlineColorAndroid="transparent"
                                                                         onChangeText={(phone) => this.setState({phone2:phone})}
                                                                     >

@@ -9,6 +9,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {setHotelNo,getData} from '../../components/active/reducer';
 import s1 from "./style/234.png";
+import s2 from "./style/sanjiao.png";
 import close from "./style/close.png";
 import zhen from "./style/zhen.png";
 import topBg from "./style/topBg.png";
@@ -41,9 +42,9 @@ const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
 
-            <View style={{backgroundColor:"#ccc",width:"100%",flexDirection:"row",borderColor:"#ccc",borderWidth:1,borderRadius:5,overflow:'hidden',padding:10}}>
+            <View style={{width:"100%",flexDirection:"row",borderColor:"#ccc",borderWidth:1,borderRadius:5,overflow:'hidden',padding:10}}>
                 <View style={{flex:3,}}><Text>{props.extra}</Text></View>
-                <View style={{flex:1,alignItems:"center",justifyContent:"center",}}><Image style={{height:10,width:15}} source={s1}/></View>
+                <View style={{flex:1,alignItems:"center",justifyContent:"center",}}><Image style={{height:10,width:15}} source={s2}/></View>
             </View>
         </TouchableHighlight>
     )
@@ -892,7 +893,7 @@ class A extends Component {
                                                     <View style={styles.b}>
                                                         <TextInput
                                                             placeholder={this.state.userInfo==''?"客户姓名/房间号/手机号":this.state.userInfo}
-                                                            style={{minWidth:'100%',padding:10,backgroundColor:"#ccc",borderRadius:5,}}
+                                                            style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                             underlineColorAndroid="transparent"
                                                             onChangeText={(name) => this.setState({userInfo:name})}
                                                         >
