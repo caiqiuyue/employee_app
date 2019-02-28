@@ -914,16 +914,30 @@ const RoomInfo = props => {
 
     //获取租金方案
     getRentPolicy = (_item={})=>{
+        
+        console.log(_item,'123456788765432sdfghj');
 
         let {room,rentInDate,customer,lease} = this.state;
 
-        axios.post(`/common/getRentPolicy`, {
+        let data = {
             hotelNo:this.props.reduxData.hotelNo,
             roomNo:room[0],
             comefrom:customer[0],
             rentPeriod:lease[0]-0,
             checkinDate:moment(rentInDate).format('YYYY-MM-DD'),
-        })
+        }
+
+
+        if(this.state.changeMsg=='预订单'){
+            if(_item){
+                data.policyId = _item.policyId;
+                data.orderNo = _item.orderNo;
+            }
+        }
+
+
+
+        axios.post(`/common/getRentPolicy`, data)
             .then((response) =>{
                 console.log(response,'获取租金方案');
 
@@ -953,8 +967,6 @@ const RoomInfo = props => {
                         ccc[0] = rentPolicyList[0].value;
                         ddd = data[0]
                     }else {
-
-
 
                         data.map((item)=>{
                             if(item.policyId==_item.policyId){
@@ -2304,8 +2316,8 @@ const RoomInfo = props => {
                                                                     extra='请选择房间'
                                                                     disabled={this.disabled}
                                                                     // onChange={(data) => {this.setCity(data)}}
-                                                                    onChange={data => {this.setState({room:data})}}
-                                                                    onOk={data => {this.setState({room:data})}}
+                                                                    onChange={data => {this.setState({room:data},()=>{this.getRentPolicy()})}}
+                                                                    // onOk={data => {this.setState({room:data},()=>{this.getRentPolicy()})}}
                                                                     className="forss">
                                                                     <RoomInfo></RoomInfo>
                                                                 </Picker>
@@ -2508,6 +2520,7 @@ const RoomInfo = props => {
                                                                     cols={1}
                                                                     value={customer}
                                                                     extra='请选择客户来源'
+                                                                    disabled={this.disabled}
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {this.setState({customer:data})}}
                                                                     onOk={data => {this.setState({customer:data})}}
@@ -2530,6 +2543,7 @@ const RoomInfo = props => {
                                                                     data={leaseList}
                                                                     cols={1}
                                                                     value={lease}
+                                                                    disabled={this.disabled}
                                                                     extra='请选择租期'
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={(lease) => {this.setState({lease},()=>{this.setRentOutDate()})}}
@@ -2555,6 +2569,7 @@ const RoomInfo = props => {
                                                                     value={this.state.rentInDate}
                                                                     mode="date"
 
+                                                                    disabled={this.disabled}
                                                                     onChange={(rentInDate) => {this.setState({rentInDate},()=>{this.setRentOutDate()})}}
                                                                     // onOk={(rentInDate) => {this.setState({rentInDate},()=>{this.setRentOutDate()})}}
 
@@ -2617,7 +2632,6 @@ const RoomInfo = props => {
                                                             <Text style={{flex:1}}>房间:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
-
                                                                 <Picker
                                                                     data={roomList}
                                                                     cols={1}
@@ -2625,8 +2639,8 @@ const RoomInfo = props => {
                                                                     extra='请选择房间'
                                                                     disabled={this.disabled}
                                                                     // onChange={(data) => {this.setCity(data)}}
-                                                                    onChange={data => {this.setState({room:data})}}
-                                                                    onOk={data => {this.setState({room:data})}}
+                                                                    onChange={data => {this.setState({room:data},()=>{this.getRentPolicy()})}}
+                                                                    // onOk={data => {this.setState({room:data})}}
                                                                     className="forss">
                                                                     <RoomInfo></RoomInfo>
                                                                 </Picker>
@@ -2647,6 +2661,7 @@ const RoomInfo = props => {
                                                                     cols={1}
                                                                     value={this.state.rentPolicy}
                                                                     extra='请选择租金方案'
+
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {this.setState({rentPolicy:data},()=>{this.changeRentPolicy()})}}
                                                                     onOk={data => {this.setState({rentPolicy:data}),()=>{this.changeRentPolicy()}}}
@@ -2693,6 +2708,7 @@ const RoomInfo = props => {
                                                                     cols={1}
                                                                     value={sale}
                                                                     extra='请选择上户人'
+                                                                    disabled={this.disabled}
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {this.setState({sale:data})}}
                                                                     onOk={data => {this.setState({sale:data})}}
@@ -2716,6 +2732,7 @@ const RoomInfo = props => {
                                                                     cols={1}
                                                                     value={daikanren}
                                                                     extra="请选择带看人"
+                                                                    disabled={this.disabled}
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {this.setState({daikanren:data})}}
                                                                     onOk={data => {this.setState({daikanren:data})}}
@@ -2756,6 +2773,7 @@ const RoomInfo = props => {
                                                                 <TextInput
                                                                     placeholder={this.state.username?this.state.username:'姓名'}
                                                                     // value={this.state.username}
+                                                                    editable={!this.disabled}
                                                                     style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
                                                                     onChangeText={(name) => this.setState({username:name})}
@@ -2776,6 +2794,7 @@ const RoomInfo = props => {
                                                                         style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5}}
                                                                         underlineColorAndroid="transparent"
                                                                         value={this.state.phone}
+                                                                        editable={!this.disabled}
                                                                         onChangeText={(phone) => this.setState({phone:phone})}
                                                                     >
                                                                     </TextInput>
@@ -2842,7 +2861,7 @@ const RoomInfo = props => {
                                                                                     <View style={{alignItems:"center",marginTop:3}}>
                                                                                         <TextInput
                                                                                             placeholder={'请填写金额'}
-                                                                                            style={{minWidth:'100%',padding:5,backgroundColor:"#fff",borderRadius:5,textAlign:'center',color:"#fff"}}
+                                                                                            style={{minWidth:'100%',padding:5,borderRadius:5,textAlign:'center',color:"#fff"}}
                                                                                             underlineColorAndroid="transparent"
                                                                                             value={item.amount+''}
                                                                                             keyboardType={'numeric'}

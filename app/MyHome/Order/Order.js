@@ -776,7 +776,7 @@ class GoodSelect extends Component {
                                             {
                                                 this.state.repairImgs.map((item,index)=>
                                                     <View key={index} style={{alignItems:"center",justifyContent:"center"}} >
-                                                        <Image style={{height:Dimensions.get('window').height-200,width:"100%",resizeMode:"stretch"}}
+                                                        <Image style={{height:Dimensions.get('window').height-200,width:"100%",resizeMode:"contain"}}
                                                                source={{uri:item}}
                                                         />
                                                     </View>

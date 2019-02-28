@@ -520,7 +520,7 @@ class Mine extends React.Component {
                                                     {
                                                         roomInfo.images.map((item,index)=>
                                                             <View key={index} style={{height:110,marginTop:10}} >
-                                                                <Image style={{height:100,width:"80%",resizeMode:"stretch"}}
+                                                                <Image style={{height:100,width:"100%",resizeMode:"contain"}}
                                                                        source={{uri:item}}
                                                                 />
                                                             </View>
