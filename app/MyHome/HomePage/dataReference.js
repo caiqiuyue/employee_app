@@ -215,6 +215,9 @@ class A extends Component {
         let flag = moment(date).isBefore(date2);
 
 
+        console.log(date);
+        console.log(date2);
+
         if(flag){
             this.setState({date1:date},()=>{this.getAll();this._showLoading()})
         }else {
@@ -580,8 +583,13 @@ class A extends Component {
                                         </View>
 
                                         <View style={[styles.aaa]}>
-                                            <Text style={styles.bbb}>累计预定数</Text>
-                                            <Text style={styles.ccc}>{manageData.map.totalOrder}</Text>
+                                            <Text style={styles.bbb}>累计定金数</Text>
+                                            <Text style={styles.ccc}>{manageData.map.totalOrderArrange}</Text>
+                                        </View>
+
+                                        <View style={[styles.aaa]}>
+                                            <Text style={styles.bbb}>累计意向金数</Text>
+                                            <Text style={styles.ccc}>{manageData.map.totalOrderNotArrange}</Text>
                                         </View>
 
 

@@ -453,6 +453,7 @@ class GoodSelect extends Component {
                     comeDate:moment(date).format('YYYY-MM-DD hh:mm'),
                     status:'1',
                     type:serverItem.type,
+                    hotelNo:this.props.reduxData.hotelNo,
                 })
                     .then((response) =>{
                         console.log(response,'确定接受');
@@ -487,7 +488,8 @@ class GoodSelect extends Component {
                 id:serverItem.id,
                 status:'3',
                 type:serverItem.type,
-                butlerMsg:this.state.butlerMsg
+                butlerMsg:this.state.butlerMsg,
+                hotelNo:this.props.reduxData.hotelNo,
             })
                 .then((response) =>{
                     console.log(response,'确定完成');
@@ -526,6 +528,7 @@ class GoodSelect extends Component {
             axios.post(`/steward/replyProposal`, {
                 id:serverItem.id,
                 reply:content,
+                hotelNo:this.props.reduxData.hotelNo,
             })
                 .then((response) =>{
                     console.log(response,'回复完成');

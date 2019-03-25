@@ -3,7 +3,7 @@ import {FlatList,View,DeviceEventEmitter, ScrollView,Text, TouchableHighlight, T
 
 import Dimensions from "Dimensions";
 import axios from "../../axios";
-import {DatePicker,Toast} from 'antd-mobile'
+import {Carousel,Toast} from 'antd-mobile'
 import shaixuan from "../HomePage/style/shaixuan.png";
 import s1 from "../HomePage/style/234.png";
 import close from "../HomePage/style/close.png";
@@ -86,7 +86,9 @@ class Mine extends React.Component {
 
 
             ],
-            roomStatu:0
+            roomStatu:0,
+            modal:'',
+            pics:[]
 
 
         }
@@ -364,7 +366,8 @@ class Mine extends React.Component {
 
         this.setState({
             modalVisible:true,
-            roomInfo:item
+            roomInfo:item,
+            modal:''
         })
 
     }
@@ -373,12 +376,28 @@ class Mine extends React.Component {
         this.setState({ modalVisible: visible });
     };
 
+    seePic = (index)=>{
+        let {roomInfo} = this.state
+
+        let pics = JSON.parse(JSON.stringify(roomInfo.images));
+        if(roomInfo.images.length==1){
+            pics.push(roomInfo.images[0])
+        }
+        
+        console.log(roomInfo.images.length,'roomInfo.images.length');
+
+        this.setState({
+            picsIndex:index,
+            modal:'查看图片',
+            pics:pics
+        })
+    }
 
 
 
     render(){
 
-        let {flag,electricityMoney,waterMoney,hotWaterMoney,handelMsg,changeMsg,data,menterData,roomInfo} = this.state;
+        let {pics,picsIndex,flag,electricityMoney,waterMoney,hotWaterMoney,handelMsg,changeMsg,data,menterData,roomInfo} = this.state;
 
         //弹框
         let modalBackgroundStyle = {
@@ -443,98 +462,137 @@ class Mine extends React.Component {
 
                                 </View>
 
+                                {
+                                    this.state.modal=='查看图片'?
+                                        <View style={{height:Dimensions.get('window').height-100}}>
 
-                                <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
-                                    <View style={{padding:10}}>
+                                            {
+                                                <View>
+                                                    <Carousel
+                                                        autoplay={false}
+                                                        infinite={true}
+                                                        selectedIndex={picsIndex-0}
+                                                        dots={roomInfo.images.length==1?false:true}
 
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>房间号:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{roomInfo.roomNo}</Text>
-                                            </View>
-                                        </View>
-
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>房间状态:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{roomInfo.stateName}</Text>
-                                            </View>
-                                        </View>
-
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>查房人:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{roomInfo.userName}</Text>
-                                            </View>
-                                        </View>
-
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>查房时间:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{moment(roomInfo.createTime).format("YYYY-MM-DD HH:mm:ss")}</Text>
-                                            </View>
-                                        </View>
-
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>剩余电费:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{roomInfo.electricMoney}元</Text>
-                                            </View>
-                                        </View>
-
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>剩余水费:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{roomInfo.waterMoney}元</Text>
-                                            </View>
-                                        </View>
-
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>剩余热水费:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{roomInfo.hotWaterMoney}元</Text>
-                                            </View>
-                                        </View>
-
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>赔偿费:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{roomInfo.damageFee}元</Text>
-                                            </View>
-                                        </View>
-
-                                        <View style={styles.a}>
-                                            <Text style={{flex:1}}>备注:</Text>
-                                            <View style={[styles.b,{flex:3}]}>
-                                                <Text style={{flex:1}}>{roomInfo.remark}</Text>
-                                            </View>
-                                        </View>
-
-                                        {
-                                            (roomInfo.images)&&
-                                            <View style={styles.allLine}>
-                                                <View style={{flex:1,}}><Text >{}</Text></View>
-                                                <View style={{flex:3,}}>
-
-
-                                                    {
-                                                        roomInfo.images.map((item,index)=>
-                                                            <View key={index} style={{height:110,marginTop:10}} >
-                                                                <Image style={{height:100,width:"100%",resizeMode:"contain"}}
-                                                                       source={{uri:item}}
+                                                    >
+                                                        {pics.map((val, index) => (
+                                                            <View key={index}>
+                                                                <Image
+                                                                    source={{uri:val}}
+                                                                    style={{
+                                                                        height: '100%',
+                                                                        width: '100%',
+                                                                        resizeMode: "contain"
+                                                                    }}
+                                                                    alt=""
                                                                 />
                                                             </View>
-                                                        )
-                                                    }
-
-
+                                                        ))}
+                                                    </Carousel>
                                                 </View>
 
-                                            </View>
-                                        }
 
-                                    </View>
-                                </ScrollView>
+                                            }
+                                        </View>:
+                                        <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+                                            <View style={{padding:10}}>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>房间号:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{roomInfo.roomNo}</Text>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>房间状态:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{roomInfo.stateName}</Text>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>查房人:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{roomInfo.userName}</Text>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>查房时间:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{moment(roomInfo.createTime).format("YYYY-MM-DD HH:mm:ss")}</Text>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>剩余电费:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{roomInfo.electricMoney}元</Text>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>剩余水费:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{roomInfo.waterMoney}元</Text>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>剩余热水费:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{roomInfo.hotWaterMoney}元</Text>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>赔偿费:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{roomInfo.damageFee}元</Text>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>备注:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <Text style={{flex:1}}>{roomInfo.remark}</Text>
+                                                    </View>
+                                                </View>
+
+                                                {
+                                                    (roomInfo.images)&&
+                                                    <View style={styles.allLine}>
+                                                        <View style={{flex:1,}}><Text >{}</Text></View>
+                                                        <View style={{flex:3,}}>
+
+
+                                                            {
+                                                                roomInfo.images.map((item,index)=>
+                                                                    <TouchableHighlight underlayColor="transparent" onPress={()=>{this.seePic(index)}}  key={index} style={{height:110,marginTop:10}} >
+                                                                        <Image style={{height:100,width:"100%",resizeMode:"contain"}}
+                                                                               source={{uri:item}}
+                                                                        />
+                                                                    </TouchableHighlight>
+                                                                        )
+                                                                        }
+
+
+                                                        </View>
+
+                                                    </View>
+                                                }
+
+                                            </View>
+                                        </ScrollView>
+
+                                }
+
+
+
+
+
+
 
 
 

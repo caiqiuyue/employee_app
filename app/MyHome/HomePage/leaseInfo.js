@@ -9,7 +9,10 @@ import axios from "../../axios";
 import Contract from "./contract";
 import {Toast} from "antd-mobile";
 import LinearGradient from 'react-native-linear-gradient';
-export default class A extends Component {
+import {setHotelNo} from "../../components/active/reducer";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+class A extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -60,6 +63,7 @@ export default class A extends Component {
         },
             axios.post(`/checkin/getCheckinInfo`, {
             checkinNo:data.tradeId,
+            hotelNo:this.props.reduxData.hotelNo,
             })
                 .then((response) =>{
                     console.log(response,'详情');
@@ -114,6 +118,7 @@ export default class A extends Component {
 
                 axios.post(`/checkin/getCheckinInfo`, {
                     checkinNo:data.tradeId,
+                    hotelNo:this.props.reduxData.hotelNo
                 })
                     .then((response) =>{
                         console.log(response,'详情');
@@ -162,6 +167,7 @@ export default class A extends Component {
             }else if(item.value=='日志'){
                 axios.post(`/checkin/getCheckinOperate`, {
                     checkinNo:data.tradeId,
+                    hotelNo:this.props.reduxData.hotelNo,
 
                 })
                     .then((response) =>{
@@ -430,3 +436,7 @@ const styles = StyleSheet.create({
     }
 
 });
+export default connect (
+    state => ({reduxData: state.reduxData}),
+    dispath => bindActionCreators({setHotelNo},dispath)
+)(A);

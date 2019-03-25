@@ -12,6 +12,7 @@ import s1 from "./style/234.png";
 import s2 from "./style/sanjiao.png";
 import close from "./style/close.png";
 import zhen from "./style/zhen.png";
+import zhen2 from "./style/zhen2.png";
 import topBg from "./style/topBg.png";
 import shaixuan from "./style/shaixuan.png";
 import stop from "./style/stop.png";
@@ -411,14 +412,18 @@ class A extends Component {
         
         console.log(data);
 
+        if(data.tradeType!=2){
+            this.setState({
+                userData:data,
+                modal:"",
+            },()=>{
+                this._setModalVisible(true);
+            })
+        }
 
 
-        this.setState({
-            userData:data,
-            modal:"",
-        },()=>{
-            this._setModalVisible(true);
-        })
+
+
 
 
 
@@ -1246,9 +1251,10 @@ class A extends Component {
 
                                                         <TouchableHighlight underlayColor="transparent" onPress={() => this.allHomeGrid(item)}>
 
-                                                            <View  style={{backgroundColor:item.checkinState==1?"#0074c3":"#fff",height:60,borderColor:"transparent",borderWidth:1,borderRadius:5}}>
+                                                            <View  style={{backgroundColor:(item.checkinState==1&&item.tradeType==1)?"#0074c3":(item.checkinState==1&&item.tradeType==2)?'#8080c0':"#fff",height:60,borderColor:"transparent",borderWidth:1,borderRadius:5}}>
 
-                                                                {item.orderState==1&&<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen} style={{height:20,width:20}}/></View>}
+                                                                {(item.orderState==1&&item.tradeType==3)&&<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen} style={{height:20,width:20}}/></View>}
+                                                                {(item.orderState==1&&item.tradeType==4)&&<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen2} style={{height:20,width:20}}/></View>}
                                                                 {item.repairState==0&&<View style={{position:"absolute",zIndex:999,top:16,right:3}}><Text style={{color:"red"}}>维修</Text></View>}
 
 
