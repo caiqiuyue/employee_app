@@ -533,7 +533,7 @@ class Mine extends React.Component {
                                                 </View>
 
                                                 <View style={styles.a}>
-                                                    <Text style={{flex:1}}>剩余水费:</Text>
+                                                    <Text style={{flex:1}}>剩余冷水费:</Text>
                                                     <View style={[styles.b,{flex:3}]}>
                                                         <Text style={{flex:1}}>{roomInfo.waterMoney}元</Text>
                                                     </View>
@@ -718,11 +718,11 @@ class Mine extends React.Component {
 
 
                                 <View style={styles.allLine}>
-                                    <View style={{flex:1,}}><Text >剩余水量(吨):</Text></View>
+                                    <View style={{flex:1,}}><Text >剩余冷水量(吨):</Text></View>
                                     <View style={{flex:3,}}>
                                         <View style={styles.allInput}>
                                             <TextInput
-                                                placeholder="剩余水量"
+                                                placeholder="剩余冷水量"
                                                 style={{minWidth:180,padding: 8,}}
                                                 keyboardType={'numeric'}
                                                 underlineColorAndroid="transparent"
@@ -738,7 +738,7 @@ class Mine extends React.Component {
                                 </View>
 
                                 <View style={styles.allLine}>
-                                    <View style={{flex:1,}}><Text >水费:</Text></View>
+                                    <View style={{flex:1,}}><Text >冷水费:</Text></View>
                                     <View style={{flex:3,}}><Text style={{color:"#f17e3a"}}>共计:{`${(this.state.water?this.state.water:0)}x${(data.hotelWater?data.hotelWater:0)}=${waterMoney.toFixed(2)}元`}</Text></View>
 
                                 </View>

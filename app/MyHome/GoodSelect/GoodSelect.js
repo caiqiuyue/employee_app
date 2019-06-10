@@ -57,7 +57,7 @@ const RoomInfo = props => {
 
             ],
             paddingbottom: 0,
-
+            price:0,
             apm: null,
             modal: null,
             username: '',
@@ -210,7 +210,8 @@ const RoomInfo = props => {
             aa: false,
             bb: false,
             cc: false,
-            realName: ''
+            realName: '',
+            depositData:{}
 
         };
 
@@ -1686,12 +1687,88 @@ const RoomInfo = props => {
                 })
         });
 
-
-
-
-
         
     }
+
+
+     deposit = ()=>{
+        if(!this.state.price){
+            alert('请填写金额')
+            return
+        }
+
+         axios.post(`/checkin/updateApaOrder`, {
+             orderId:this.state.depositData.id,
+             price:this.state.price,
+             payTool:'WECHATOFFICIAL',
+             hotelNo:this.props.reduxData.hotelNo,
+
+         })
+             .then((response) =>{
+                 console.log(response,'补定金');
+                 if(response.data.code==0){
+                     let data = response.data.data;
+                     //读取
+                     storage.load({
+                         key: 'username',
+                         // autoSync(默认为true)意味着在没有找到数据或数据过期时自动调用相应的sync方法
+                         autoSync: false
+                     }).then(ret => {
+
+
+                         let aaa = ret.hotelList.filter(_item=>{
+                             return _item.hotelNo==this.props.reduxData.hotelNo
+                         })
+
+
+
+
+                         wechat.shareToSession({
+                             title:'补定金',
+                             description: `${aaa[0].hotelName} ${this.state.depositData.roomNo}-${this.state.depositData.bookUser}`,
+                             // thumbImage: ' http://47.95.116.56:8080/file_upload/images/app/logo.png',
+                             type: 'news',
+                             webpageUrl: data
+                         })
+                             .catch((error) => {
+                                 Alert.alert(error.message);
+                             });
+
+                         ret.payOrderId = response.data.payOrderId
+                         return ret
+
+                     }).catch(err => {
+                         //如果没有找到数据且没有sync方法，
+                         //或者有其他异常，则在catch中返回
+                         console.warn(err.message);
+                         switch (err.name) {
+                             case 'NotFoundError':
+                                 break;
+                             case 'ExpiredError':
+                                 break;
+                         }
+                     });
+                 }else if(response.data.code==1){
+                     alert(response.data.message);
+                 }
+
+             })
+             .catch(function (error) {
+                 console.log(error);
+             })
+     }
+
+     setDeposit = (item)=>{
+        console.log(item,'itemitemitemitemitem');
+         this.setState({
+             price:0,
+             modal:'补定金',
+             depositData:item,
+             modalVisible:true
+
+         })
+
+     }
 
     //确定添加预约客户
     submit=()=>{
@@ -2905,7 +2982,67 @@ const RoomInfo = props => {
 
                                                     </View>
                                                 </ScrollView>
-                                            </View>:null
+                                            </View>:
+                                                this.state.modal=='补定金'?
+                                                    <View>
+                                                        <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
+
+                                                            <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:16}}>补定金</Text></View>
+
+                                                            <TouchableHighlight underlayColor={"#fff"} onPress={()=>{this._setModalVisible(false)} } style={{}}>
+                                                                <Image style={{height:30,width:30}} source={close}/>
+                                                            </TouchableHighlight>
+
+
+                                                        </View>
+
+                                                        <View style={{alignItems:"center",marginTop:10}}>
+                                                            <Text style={{fontSize:18,fontWeight:"bold",color:"#0074c3"}}>{this.state.hotelName}</Text>
+                                                        </View>
+
+                                                        <ScrollView style={{height:Dimensions.get('window').height-200}}>
+
+                                                            <View style={{paddingRight:20,marginTop:10,paddingBottom:300}}>
+
+                                                                <View style={styles.a}>
+                                                                    <Text  style={{flex:1}}>补定金:</Text>
+                                                                    <View style={[styles.b,{flex:3}]}>
+                                                                        <TextInput
+                                                                            placeholder={'请填写金额'}
+                                                                            style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                            underlineColorAndroid="transparent"
+                                                                            keyboardType={'numeric'}
+                                                                            onChangeText={(price) => this.setState({price})}
+                                                                        >
+                                                                        </TextInput>
+                                                                    </View>
+                                                                </View>
+
+
+                                                                <View style={{alignItems:"center",marginTop:10}}>
+
+
+                                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                                            alignItems:"center"
+                                                                        }} onPress={this.deposit }>
+                                                                            <Text
+                                                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                                确定
+                                                                            </Text>
+                                                                        </TouchableHighlight>
+                                                                    </LinearGradient>
+
+
+                                                                </View>
+
+
+
+
+
+                                                            </View>
+                                                        </ScrollView>
+                                                    </View>:null
 
 
                                 }
@@ -3118,24 +3255,39 @@ const RoomInfo = props => {
                                                 </View>
                                             </TouchableHighlight>}
 
-                                            {
-                                                item.payState==1&&
-                                            (item.status=='已预定'||item.status=='已排房'?
 
-                                                <TouchableHighlight  style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]} underlayColor="transparent" onPress={()=>{this.checkin(item)}}>
+
+                                            <View style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]}>
+
+                                                {(item.payState==1&&(item.status=='已预定'||item.status=='已排房'))&&
+
+                                                <TouchableHighlight  style={{marginBottom:10}} underlayColor="transparent" onPress={()=>{this.setDeposit(item)}}>
 
                                                     <View style={{alignItems:"center",justifyContent:"center"}}>
-                                                        <Text style={{}}>{item.status}</Text>
-                                                        <Text style={{color:"red",marginTop:3}}>签约</Text>
+                                                        <Text style={{color:"red"}}>补定金</Text>
                                                     </View>
+                                                </TouchableHighlight>}
+                                                {
+                                                    item.payState==1&&
+                                                    (item.status=='已排房'?
+
+                                                        <TouchableHighlight underlayColor="transparent" onPress={()=>{this.checkin(item)}}>
+
+                                                            <View style={{alignItems:"center",justifyContent:"center"}}>
+                                                                <Text style={{}}>{item.status}</Text>
+                                                                <Text style={{color:"red",marginTop:3}}>签约</Text>
+                                                            </View>
 
 
-                                                </TouchableHighlight>:
-                                                <View style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]}>
-                                                    <Text>{item.status}</Text>
-                                                </View>)
+                                                        </TouchableHighlight>:
+                                                        <View>
+                                                            <Text>{item.status}</Text>
+                                                        </View>)
 
-                                            }
+                                                }
+                                            </View>
+
+
                                         </View>
                                     )}
 

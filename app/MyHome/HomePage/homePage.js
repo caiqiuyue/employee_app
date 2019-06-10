@@ -1251,7 +1251,7 @@ class A extends Component {
 
                                                         <TouchableHighlight underlayColor="transparent" onPress={() => this.allHomeGrid(item)}>
 
-                                                            <View  style={{backgroundColor:(item.checkinState==1&&item.tradeType==1)?"#0074c3":(item.checkinState==1&&item.tradeType==2)?'#8080c0':"#fff",height:60,borderColor:"transparent",borderWidth:1,borderRadius:5}}>
+                                                            <View  style={{backgroundColor:(item.checkinState==1&&item.tradeType==1&&item.longCheckin!==1)?"#0074c3":(item.checkinState==1&&item.tradeType==2)?'#8080c0':(item.checkinState==1&&item.tradeType==1&&item.longCheckin==1)?'#8eade7':"#fff",height:60,borderColor:"transparent",borderWidth:1,borderRadius:5}}>
 
                                                                 {(item.orderState==1&&item.tradeType==3)&&<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen} style={{height:20,width:20}}/></View>}
                                                                 {(item.orderState==1&&item.tradeType==4)&&<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen2} style={{height:20,width:20}}/></View>}

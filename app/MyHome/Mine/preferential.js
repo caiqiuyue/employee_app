@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {FlatList,View,DeviceEventEmitter, ScrollView,Text, TouchableHighlight, TextInput,Image, ImageBackground, StyleSheet,Platform} from 'react-native';
+import {FlatList,View,Alert, ScrollView,Text, TouchableHighlight, TextInput,Image, ImageBackground, StyleSheet,Platform} from 'react-native';
 
 import Dimensions from "Dimensions";
 import coupons from "./style/coupons.png";
@@ -248,7 +248,36 @@ class Mine extends React.Component {
 
     };
 
+    cancelSelected = ()=>{}
 
+    walletSelected=()=>{
+        let {confId,amount,phone,couponsData} = this.state;
+        axios.post(`/coupon/grantCoupon`, {
+            phoneNo:phone,
+            confId:confId,
+            couponCount:amount,
+            hotelNo:this.props.reduxData.hotelNo
+
+        })
+            .then((response) =>{
+                console.log(response,'确认发放优惠券');
+
+
+                this.setState({
+                    flag:response.data.code==0?true:false
+                });
+
+                Toast.info(response.data.code==0?'发放优惠券成功':response.data.message,1);
+
+
+            })
+            .catch((error)=> {
+                console.log(error);
+                this.setState({
+                    flag:false
+                })
+            })
+    }
     //发放优惠券
     submitBtn=()=>{
         let {confId,amount,phone,couponsData} = this.state;
@@ -279,33 +308,13 @@ class Mine extends React.Component {
         }
 
 
-        axios.post(`/coupon/grantCoupon`, {
-            phoneNo:phone,
-            confId:confId,
-            couponCount:amount,
-            hotelNo:this.props.reduxData.hotelNo
-
-        })
-            .then((response) =>{
-                console.log(response,'确认发放优惠券');
-
-
-                this.setState({
-                    flag:response.data.code==0?true:false
-                });
-
-                Toast.info(response.data.code==0?'发放优惠券成功':response.data.message,1);
-
-
-            })
-            .catch((error)=> {
-                console.log(error);
-                this.setState({
-                    flag:false
-                })
-            })
-
-
+        Alert.alert('确认发放','确认',
+            [
+                {text:"取消", onPress:this.cancelSelected},
+                {text:"确认", onPress:this.walletSelected}
+            ],
+            { cancelable: false }
+        );
 
     }
 

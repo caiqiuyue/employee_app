@@ -101,12 +101,12 @@ class A extends Component {
 
 
     //收银数据
-    incomeData = ()=>{
+    incomeData = (item)=>{
         let {date1,date2} = this.state;
         axios.post(`/analyze/incomeData`, {
             hotelNo:this.props.reduxData.hotelNo,
-            beginDate:moment(date1).format('YYYY-MM-DD'),
-            endDate:moment(date2).format('YYYY-MM-DD'),
+            beginDate:moment(!item?date1:new Date()).format('YYYY-MM-DD'),
+            endDate:moment(!item?date2:new Date()).format('YYYY-MM-DD'),
         })
             .then((response) =>{
                 console.log(response,'收银数据');
@@ -407,6 +407,10 @@ class A extends Component {
 
                             <View style={{padding:10}}>
 
+                                <TouchableHighlight onPress={()=>{this.incomeData(true)}} style={{marginTop:10}} underlayColor="transparent">
+                                    <Text style={{fontSize:20,fontWeight:'bold',textDecorationLine:"underline",color:"#0074c3"}}>查看今日收银</Text>
+                                </TouchableHighlight>
+
                                 <View style={{marginTop:10,justifyContent:'space-between',flexDirection:"row"}}>
                                     <Text style={{fontSize:20,fontWeight:'bold'}}>实收</Text>
                                     <Text style={{fontSize:20,fontWeight:'bold',color:"#f17e3a"}}>{incomeData.data.received}元</Text>
@@ -441,6 +445,10 @@ class A extends Component {
                                     <View style={[styles.aaa,{marginRight:0}]}>
                                         <Text style={styles.bbb}>支付宝</Text>
                                         <Text style={styles.ccc}>{incomeData.data.alipay}元</Text>
+                                    </View>
+                                    <View style={[styles.aaa,{marginRight:0}]}>
+                                        <Text style={styles.bbb}>挂帐</Text>
+                                        <Text style={styles.ccc}>{incomeData.data.unit}元</Text>
                                     </View>
                                 </View>
 

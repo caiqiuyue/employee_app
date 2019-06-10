@@ -748,35 +748,35 @@ class Mine extends React.Component {
                                                     </View>
 
                                                     <View style={{borderLeftWidth:3,borderLeftColor:'#7ebef9',marginTop:15}}>
-                                                        <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>水费</Text>
+                                                        <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>冷水费</Text>
                                                     </View>
 
                                                     <View style={{width:"100%",height:1,backgroundColor:"#f0f0f0",marginTop:10}}></View>
 
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}>上次水量:</Text>
+                                                        <Text style={styles.f}>上次冷水量:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <Text style={{flex:1}}>{roomInfo.lastWater}吨</Text>
                                                         </View>
                                                     </View>
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}>本次水量:</Text>
+                                                        <Text style={styles.f}>本次冷水量:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <Text style={{flex:1}}>{roomInfo.water}吨</Text>
                                                         </View>
                                                     </View>
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}>水费单价:</Text>
+                                                        <Text style={styles.f}>冷水费单价:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <Text style={{flex:1}}>{roomInfo.hotelWater}元</Text>
                                                         </View>
                                                     </View>
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}>水费金额:</Text>
+                                                        <Text style={styles.f}>冷水费金额:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <Text style={{flex:1}}>{roomInfo.waterMoney}元</Text>
                                                         </View>
@@ -965,7 +965,7 @@ class Mine extends React.Component {
 
 
                                 <View style={{borderLeftWidth:3,borderLeftColor:'#7ebef9',marginTop:15}}>
-                                    <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>水费</Text>
+                                    <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>冷水费</Text>
                                 </View>
 
                                 <View style={{width:"100%",height:1,backgroundColor:"#f0f0f0",marginTop:10}}></View>

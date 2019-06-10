@@ -42,6 +42,8 @@ class GoodSelect extends Component {
             changeMsg:"服务工单",
             hotelNo:"",
             butlerMsg:"",
+            operationMsg:"",
+            padd:0,
             handelMsg:[
                 {
                     value:"服务工单",
@@ -426,6 +428,8 @@ class GoodSelect extends Component {
             date:null,
             content:'',
             butlerMsg:'',
+            operationMsg:'',
+            padd:0,
         },()=>{
             this._setModalVisible(true);
             console.log(this.state.serverItem,'serverItem');
@@ -438,7 +442,7 @@ class GoodSelect extends Component {
     //确定接受
     accept=()=>{
 
-        let {date,serverItem} = this.state;
+        let {date,serverItem,operationMsg} = this.state;
 
         if(date==null){
             alert('请选择上门日期');
@@ -450,10 +454,11 @@ class GoodSelect extends Component {
             },()=>{
                 axios.post(`/steward/editServerWorkOrder`, {
                     id:serverItem.id,
-                    comeDate:moment(date).format('YYYY-MM-DD hh:mm'),
+                    comeDate:moment(date).format('YYYY-MM-DD HH:mm'),
                     status:'1',
                     type:serverItem.type,
                     hotelNo:this.props.reduxData.hotelNo,
+                    operationMsg
                 })
                     .then((response) =>{
                         console.log(response,'确定接受');
@@ -625,44 +630,63 @@ class GoodSelect extends Component {
 
                                         </View>
 
-                                        <View style={{paddingRight:20,marginTop:10}}>
+                                        <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+                                            <View style={{paddingRight:20,marginTop:10,paddingBottom:this.state.padd}}>
 
 
-                                            <Text>请选择上门日期:</Text>
-                                            <View style={{marginTop:20}}>
+                                                <Text>请选择上门日期:</Text>
+                                                <View style={{marginTop:10}}>
 
-                                                <DatePicker
-                                                    minDate={minDate}
-                                                    // maxDate={maxDate}
-                                                    extra="请选择日期"
-                                                    format={val => formatDate(val)}
-                                                    value={this.state.date}
-                                                    mode="datetime"
-                                                    onChange={date => this.setState({date})}
-                                                    onOk={date => this.setState({date})}
-                                                >
-                                                    <RoomInfo></RoomInfo>
-                                                </DatePicker>
+                                                    <DatePicker
+                                                        minDate={minDate}
+                                                        // maxDate={maxDate}
+                                                        extra="请选择日期"
+                                                        format={val => formatDate(val)}
+                                                        value={this.state.date}
+                                                        mode="datetime"
+                                                        onChange={date => this.setState({date})}
+                                                        onOk={date => this.setState({date})}
+                                                    >
+                                                        <RoomInfo></RoomInfo>
+                                                    </DatePicker>
+
+                                                </View>
+
+                                                <Text style={{marginTop:20}}>管家留言:</Text>
+                                                <View style={{marginTop:10}}>
+                                                    <TextInput
+                                                        placeholder={'管家留言'}
+                                                        multiline={true}
+                                                        style={{minWidth:'100%',height:80,padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                        underlineColorAndroid="transparent"
+                                                        onChangeText={(operationMsg) => this.setState({operationMsg,padd:200})}
+
+                                                    >
+                                                    </TextInput>
+
+
+                                                </View>
+
+
+                                                <View style={{alignItems:"center",marginTop:10}}>
+
+                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                            alignItems:"center"
+                                                        }} onPress={this.accept }>
+                                                            <Text
+                                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                确定
+                                                            </Text>
+                                                        </TouchableHighlight>
+                                                    </LinearGradient>
+
+                                                </View>
 
                                             </View>
+                                        </ScrollView>
 
 
-                                            <View style={{alignItems:"center",marginTop:10}}>
-
-                                                <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
-                                                    <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
-                                                        alignItems:"center"
-                                                    }} onPress={this.accept }>
-                                                        <Text
-                                                            style={{fontSize:16,textAlign:"center",color:"#fff"}}>
-                                                            确定
-                                                        </Text>
-                                                    </TouchableHighlight>
-                                                </LinearGradient>
-
-                                            </View>
-
-                                        </View>
                                     </View>
                                 :this.state.modal=='确定'?
                                     <View>
