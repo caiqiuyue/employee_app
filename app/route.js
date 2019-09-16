@@ -6,6 +6,7 @@ import LeaseInfo from './MyHome/HomePage/leaseInfo';
 import DataReference from './MyHome/HomePage/dataReference';
 import Preferential from './MyHome/Mine/preferential';
 import SearchRoom from './MyHome/Mine/searchRoom';
+import Approval from './MyHome/Mine/approval';
 import MeterReading from './MyHome/Mine/meterReading';
 
 
@@ -30,6 +31,20 @@ const SimpleApp = StackNavigator({
         screen: MeterReading,
         navigationOptions: {
             headerTitle:'抄表',
+            headerBackTitle:null,
+            headerStyle: {
+                backgroundColor: '#0074c3'
+            },
+            headerTitleStyle: {
+                color: '#fff'
+            },
+            headerTintColor:"#fff"
+        }
+    },
+    Approval:{
+        screen: Approval,
+        navigationOptions: {
+            headerTitle:'审批',
             headerBackTitle:null,
             headerStyle: {
                 backgroundColor: '#0074c3'

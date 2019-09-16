@@ -251,6 +251,7 @@ class Mine extends React.Component {
     cancelSelected = ()=>{}
 
     walletSelected=()=>{
+
         let {confId,amount,phone,couponsData} = this.state;
         axios.post(`/coupon/grantCoupon`, {
             phoneNo:phone,

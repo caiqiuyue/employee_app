@@ -236,7 +236,7 @@ export default class Login extends Component {
                                     <View style={{justifyContent:'center',}}><Image source={phoneIcon} style={styles.iconImg}/></View>
                                     <View style={{justifyContent:'center',alignItems:"center",marginLeft:15}}>
                                         <TextInput
-
+                                            autoCapitalize={"none"}
                                             placeholder="账号"
                                             style={{minWidth:300,padding:5}}
                                             onFocus={this.focus}

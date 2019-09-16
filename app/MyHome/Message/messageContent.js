@@ -223,17 +223,26 @@ class ReadMessage extends React.Component {
 
 
     jumptoBtn = (item) => {
+        console.log(item,'itemitemitem');
 
         const { navigate } = this.props.navigation;
 
-        if(item.sendParam== "booking_reminder"){
-            navigate('Order',{ user: item.sendParam });
+
+        switch (item)
+        {
+            case 'booking_reminder':
+                navigate('Order',{ user: item });
+                break;
+            case 'emp_approval_process':
+                console.log(123123);
+                navigate('Approval',{ user: '' });
+                break;
+            case 'emp_approval_add':
+                navigate('Approval',{ user: '' });
+                break;
+            default:
+                return false
         }
-
-
-
-
-        
 
     };
 
@@ -307,7 +316,7 @@ class ReadMessage extends React.Component {
                                                 <View style={{flex:2,marginLeft:15,justifyContent:"center",padding:10}}>
 
                                                     <TouchableHighlight
-                                                        underlayColor="#f0f0f0" onPress={()=>this.jumptoBtn(item)}
+                                                        underlayColor="#f0f0f0" onPress={()=>this.jumptoBtn(item.sendParam)}
                                                     >
                                                         <Text style={{color:"grey"}}>{item.sendContent}
                                                         <Text style={{textDecorationLine:'underline',color:"#f17e3a"}}>点击查看详情</Text>

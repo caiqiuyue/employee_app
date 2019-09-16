@@ -130,6 +130,9 @@ class Mine extends React.Component {
 
                         this.setState({
                             data:response.data.data,
+                            electricity:'',
+                            water:'',
+                            hotWater:'',
                             electricityMoney:0,
                             waterMoney:0,
                             hotWaterMoney:0,
@@ -699,6 +702,7 @@ class Mine extends React.Component {
                                                 placeholder="剩余电量"
                                                 style={{minWidth:180,padding: 8,}}
                                                 keyboardType={'numeric'}
+                                                value={this.state.electricity}
                                                 onFocus={this.toastInput}
                                                 underlineColorAndroid="transparent"
                                                 onChangeText={(electricity) => this.setState({electricity,electricityMoney:(electricity-0)*(data.hotelPower?data.hotelPower:0)})}
@@ -725,6 +729,7 @@ class Mine extends React.Component {
                                                 placeholder="剩余冷水量"
                                                 style={{minWidth:180,padding: 8,}}
                                                 keyboardType={'numeric'}
+                                                value={this.state.water}
                                                 underlineColorAndroid="transparent"
                                                 onFocus={this.toastInput}
                                                 onChangeText={(water) => this.setState({water,waterMoney:(water-0)*(data.hotelWater?data.hotelWater:0)})}
@@ -752,6 +757,7 @@ class Mine extends React.Component {
                                                 style={{minWidth:180,padding: 8,}}
                                                 onFocus={this.toastInput}
                                                 keyboardType={'numeric'}
+                                                value={this.state.hotWater}
                                                 underlineColorAndroid="transparent"
                                                 onChangeText={(hotWater) => this.setState({hotWater,hotWaterMoney:(hotWater-0)*(data.hotelWaterHot?data.hotelWaterHot:0)})}
                                             >

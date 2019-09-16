@@ -618,16 +618,6 @@ class A extends Component {
 
         this.setState({
             constractStatus
-        },()=>{
-            if(item.flag){
-                this.setState({
-                    constractStr:item.value=='新签'?-7:7
-                })
-            }else {
-                this.setState({
-                    constractStr:null
-                })
-            }
         })
 
     }
@@ -1253,8 +1243,8 @@ class A extends Component {
 
                                                             <View  style={{backgroundColor:(item.checkinState==1&&item.tradeType==1&&item.longCheckin!==1)?"#0074c3":(item.checkinState==1&&item.tradeType==2)?'#8080c0':(item.checkinState==1&&item.tradeType==1&&item.longCheckin==1)?'#8eade7':"#fff",height:60,borderColor:"transparent",borderWidth:1,borderRadius:5}}>
 
-                                                                {(item.orderState==1&&item.tradeType==3)&&<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen} style={{height:20,width:20}}/></View>}
-                                                                {(item.orderState==1&&item.tradeType==4)&&<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen2} style={{height:20,width:20}}/></View>}
+                                                                {(item.orderState==1&&item.tradeType==3)?<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen} style={{height:20,width:20}}/></View>:null}
+                                                                {(item.orderState==1&&item.tradeType==4)?<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen2} style={{height:20,width:20}}/></View>:null}
                                                                 {item.repairState==0&&<View style={{position:"absolute",zIndex:999,top:16,right:3}}><Text style={{color:"red"}}>维修</Text></View>}
 
 
@@ -1263,9 +1253,9 @@ class A extends Component {
                                                                     paddingTop: 5, paddingBottom: 5,
                                                                     alignItems: 'center', justifyContent: 'center' ,
                                                                 }}>
-                                                                    {item.customerName&&<Text style={{color:item.checkinState==1?"#fff":"#0074c3",marginTop:5,fontWeight:"bold"}}>{item.customerName}</Text>}
+                                                                    {item.customerName?<View><Text style={{color:item.checkinState==1?"#fff":"#0074c3",marginTop:5,fontWeight:"bold"}}>{item.customerName}</Text></View>:null}
                                                                     {item.enableState==0&&<View style={{}}><Image style={{width:25,height:25}} source={stop}/></View>}
-                                                                    <Text  style={{color:item.checkinState==1?"#fff":"#0074c3",paddingTop:5,fontWeight:"bold"}} >{item.roomNo}</Text>
+                                                                    <View><Text  style={{color:item.checkinState==1?"#fff":"#0074c3",paddingTop:5,fontWeight:"bold"}} >{item.roomNo}</Text></View>
 
 
 

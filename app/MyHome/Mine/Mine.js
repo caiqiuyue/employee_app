@@ -7,6 +7,7 @@ import right from "./style/right.png";
 import preferential from "./style/preferential.png";
 import meterReading from "./style/meterReading.png";
 import searchRoom from "./style/checkout.png";
+import approval from "./style/approval.png";
 import mineTop from "./style/mineTop.png";
 
 import LinearGradient from 'react-native-linear-gradient';
@@ -36,6 +37,8 @@ export default class Mine extends React.Component {
                 reject(error);
             })
     }
+
+
 
 
     //退出登陆
@@ -79,6 +82,18 @@ export default class Mine extends React.Component {
 
 
   };
+
+  //审批中心
+    approval=()=>{
+
+
+    const { navigate } = this.props.navigation;
+
+    navigate('Approval',{ user: '' })
+
+
+
+    };
 
     //移动抄表
     meterReading=()=>{
@@ -165,6 +180,16 @@ export default class Mine extends React.Component {
                     <View style={styles.aa}>
                         <View style={styles.imgView}><Image style={styles.img3} source={searchRoom}/></View>
                         <Text>退房查房</Text>
+                        <View style={{flex:1}}></View>
+                        <View>
+                            <Image style={styles.img2} source={right}/>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+                <TouchableHighlight onPress={this.approval} underlayColor="#f0f0f0">
+                    <View style={styles.aa}>
+                        <View style={styles.imgView}><Image style={styles.img3} source={approval}/></View>
+                        <Text>审批中心</Text>
                         <View style={{flex:1}}></View>
                         <View>
                             <Image style={styles.img2} source={right}/>

@@ -998,6 +998,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 272C37NXQA;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Push = {
 								enabled = 1;
@@ -1707,6 +1708,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = shanzhu/shanzhu.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 272C37NXQA;
@@ -1732,6 +1734,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.shanzhu.employees;
 				PRODUCT_NAME = shanzhu;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1743,6 +1746,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = shanzhu/shanzhu.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 272C37NXQA;
 				HEADER_SEARCH_PATHS = (
@@ -1767,6 +1771,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.shanzhu.employees;
 				PRODUCT_NAME = shanzhu;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -2042,8 +2047,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODEPUSH_KEY = QMPKRGGUv7CShb9gWAqQhQ500HDf4ksvOXqog;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: qiuyue cai (272C37NXQA)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: qiuyue cai (272C37NXQA)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -2084,8 +2089,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODEPUSH_KEY = WBYoIgtBjh0rKeASWGSX3LBKYK9J4ksvOXqog;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: qiuyue cai (272C37NXQA)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: qiuyue cai (272C37NXQA)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -2116,6 +2121,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = shanzhu/shanzhu.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 272C37NXQA;
 				HEADER_SEARCH_PATHS = (
@@ -2140,6 +2146,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.shanzhu.employees;
 				PRODUCT_NAME = shanzhu;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = staging;

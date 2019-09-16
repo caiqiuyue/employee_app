@@ -1160,7 +1160,7 @@ const RoomInfo = props => {
 
 
         if(deposit.trim()==''){
-            alert('请填写订金金额');
+            alert('请填写定金金额');
             return
         }
 
@@ -2490,7 +2490,7 @@ const RoomInfo = props => {
                                                         </View>
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>订金类型:</Text>
+                                                            <Text style={{flex:1}}>定金类型:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
 
@@ -2498,7 +2498,7 @@ const RoomInfo = props => {
                                                                     data={this.state.amountTypeList}
                                                                     cols={1}
                                                                     value={this.state.amountType}
-                                                                    extra='请选择订金类型'
+                                                                    extra='请选择定金类型'
                                                                     // onChange={(data) => {this.setCity(data)}}
                                                                     onChange={data => {this.setState({amountType:data})}}
                                                                     onOk={data => {this.setState({amountType:data})}}
@@ -2514,10 +2514,10 @@ const RoomInfo = props => {
 
 
                                                         <View style={styles.a}>
-                                                            <Text  style={{flex:1}}>订金:</Text>
+                                                            <Text  style={{flex:1}}>定金:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
-                                                                    placeholder={'订金'}
+                                                                    placeholder={'定金'}
                                                                     style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
                                                                     onChangeText={(name) => this.setState({deposit:name})}
