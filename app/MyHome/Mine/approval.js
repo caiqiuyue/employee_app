@@ -290,6 +290,20 @@ class Mine extends React.Component {
         })
     }
 
+    changeAllAmountPayJson = (data,item,index)=>{
+        let {amountJson} = this.state
+        amountJson[0].payItems.map((_item,_index)=>{
+            if(_index==index){
+                _item.pay = data
+
+            }
+        })
+
+        this.setState({
+            amountJson
+        })
+    }
+
     changeAllFees = (data,item,name)=>{
         let {fees} = this.state
         fees.map(_item=>{
@@ -980,7 +994,17 @@ class Mine extends React.Component {
                                                                 amountJson[0].payItems.map((item,index)=>
 
                                                                     <View style={styles.a} key={index}>
-                                                                        <Text style={{flex:1}}>付{item.pay}:</Text>
+                                                                        <Text>付:</Text>
+                                                                        <View style={[styles.b,{flex:1}]}>
+                                                                            <TextInput
+                                                                                placeholder={'租期'}
+                                                                                style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                                underlineColorAndroid="transparent"
+                                                                                value={item.pay+''}
+                                                                                onChangeText={(pay) => this.changeAllAmountPayJson(pay,item,index)}
+                                                                            >
+                                                                            </TextInput>
+                                                                        </View>
                                                                         <View style={[styles.b,{flex:3}]}>
                                                                             <TextInput
                                                                                 placeholder={'租金'}
