@@ -103,6 +103,22 @@ class A extends Component {
                     value: '一年'
                 }
             ],//租期选择
+            roomState:[
+
+                {
+                    label:'空房',
+                    value: 'unoccupyState'
+                },
+                {
+                    label:'已预订',
+                    value: 'orderState'
+                },
+                {
+                    label:'已入住',
+                    value: 'checkinState'
+                }
+            ],//房间状态
+            roomStateVal:[],//房间状态
             customer:[],
             lease:['一年'],
 
@@ -213,13 +229,30 @@ class A extends Component {
 
 
 
-
+    walletSelected = ()=>{
+        if(Platform.OS === 'android'){
+            let url = 'http://fangapo.cn/shanzhuEmp.apk';
+            Linking.openURL(url)
+        }else {
+            let url = 'itms-apps://itunes.apple.com/us/app/%E9%97%AA%E7%8C%AA%E5%91%98%E5%B7%A5/id1435579778?l=zh&ls=1&mt=8';
+            Linking.openURL(url)
+        }
+    }
 
 
     componentWillMount(){
         console.log(DeviceInfo.getVersion());
 
         // alert('1234qw');
+        // if(Platform.OS!== 'android'){
+        //     Alert.alert('下载最新app','为了更好的使用体验，ios用户请更新最新版本app！',
+        //         [
+        //             // {text:"取消", onPress:this.cancelSelecte},
+        //             {text:"确认", onPress:this.walletSelected}
+        //         ],
+        //         { cancelable: false }
+        //     );
+        // }
 
         storage.load({ //读取tokenKey
             key: 'username',
@@ -552,6 +585,7 @@ class A extends Component {
         axios.post(`/roomState/getRoomStateByParam`, {
             hotelNo:this.hotelNo,
             roomtypeNo:this.state.room?this.state.room[0]:null,
+            roomState:this.state.roomStateVal?this.state.roomStateVal[0]:'',
             // floorNo:this.state.floorNo,
             buildingNo:this.state.build?this.state.build[0]:null,
             nameRoom:this.state.userInfo,
@@ -803,7 +837,7 @@ class A extends Component {
 
 
 
-        let {price,roomData,refreshing,leaseData,lease,customerFrom,customer,billStatus,constractStatus,tedian,district,value,userData,modal,roomInfo,room,buildingInfo,layerInfo,layer,build} = this.state;
+        let {roomStateVal,roomState,price,roomData,refreshing,leaseData,lease,customerFrom,customer,billStatus,constractStatus,tedian,district,value,userData,modal,roomInfo,room,buildingInfo,layerInfo,layer,build} = this.state;
 
         //弹框
         let modalBackgroundStyle = {
@@ -894,6 +928,26 @@ class A extends Component {
                                                         >
                                                         </TextInput>
                                                     </View>
+                                                </View>
+
+                                                <View style={styles.a}>
+                                                    <Text>房间状态</Text>
+                                                    <View style={[styles.b,]}>
+
+                                                        <Picker
+                                                            data={roomState}
+                                                            cols={1}
+                                                            value={roomStateVal}
+                                                            extra="房间状态"
+                                                            // onChange={(data) => {this.setCity(data)}}
+                                                            // onChange={data => {this.getRoomNo(data)}}
+                                                            onOk={data => {this.setState({roomStateVal:data})}}
+                                                            className="forss">
+                                                            <RoomInfo></RoomInfo>
+                                                        </Picker>
+
+                                                    </View>
+
                                                 </View>
 
                                                 {roomInfo.length>0&&
