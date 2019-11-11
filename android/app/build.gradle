@@ -124,7 +124,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('/Users/useradmin/Desktop/employee_app/android/app/my-release-key.keystore')
+            storeFile file('/Users/luoquan/Desktop/employee_app/android/app/my-release-key.keystore')
             storePassword 'shanzhu123456'
             keyAlias 'my-key-alias'
             keyPassword 'shanzhu123456'
