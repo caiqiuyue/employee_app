@@ -1,2 +1,5 @@
-let a = '12,123,123'
-console.log(a.split(','));
+
+
+let a = 11
+
+console.log(city[a])

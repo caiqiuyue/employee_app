@@ -63,6 +63,7 @@ class A extends Component {
             userData:{},
             userInfo:"",
             modal:"查看报价",
+            rentPrice:[],
             district:[],//选择不同门店
             roomInfo:[],//选择房型信息
             buildingInfo:[],//选择楼栋信息
@@ -269,11 +270,11 @@ class A extends Component {
                     label:item.hotelName,
 
                 }
-                
+
                 a.push(b)
-                
+
             })
-            
+
             console.log(a[0].value);
 
             this.defaultValue = a[0].value;
@@ -312,10 +313,12 @@ class A extends Component {
     //获取房态
 
     getRoomState = ()=>{
+        Toast.loading('loading')
         axios.post(`/roomState/getRoomStateByParam`, {
             hotelNo:this.hotelNo,
         })
             .then((response) =>{
+                Toast.hide()
                 console.log(response,'获取房态');
 
                 this.setState({
@@ -442,7 +445,7 @@ class A extends Component {
 
     //点击每个房间
     allHomeGrid=(data)=>{
-        
+
         console.log(data);
 
         if(data.tradeType!=2){
@@ -465,7 +468,7 @@ class A extends Component {
 
     //选择门店
     setCity=(data)=>{
-        
+
         console.log(data);
 
         this.state.district.map((item)=>{
@@ -473,14 +476,14 @@ class A extends Component {
                 this.hotelNo = data[0]
             }
         })
-        
+
         console.log(this.hotelNo);
 
 
         this.onRefresh();
 
-        
-        
+
+
         this.setState({value:data},()=>{
 
             this.props.setHotelNo(this.hotelNo);
@@ -522,7 +525,8 @@ class A extends Component {
             {
                 modal:"查看报价",
                 flag:false,
-                price:{}
+                price:{},
+                rentPrice:[],
             },
 
             ()=>{
@@ -813,11 +817,17 @@ class A extends Component {
             .then((response) =>{
                 console.log(response);
 
-                if(response.data.code==0&&response.data.data){
-                    this.setState({
-                        price:response.data.data,
-                        flag:true
-                    })
+                if(response.data.code==0){
+                    if(response.data.data){
+                        this.setState({
+                            price:response.data.data,
+                            rentPrice:response.data.list,
+                            flag:true
+                        })
+                    }
+
+                }else {
+                    alert(response.data.message)
                 }
 
 
@@ -837,7 +847,7 @@ class A extends Component {
 
 
 
-        let {roomStateVal,roomState,price,roomData,refreshing,leaseData,lease,customerFrom,customer,billStatus,constractStatus,tedian,district,value,userData,modal,roomInfo,room,buildingInfo,layerInfo,layer,build} = this.state;
+        let {rentPrice,roomStateVal,roomState,price,roomData,refreshing,leaseData,lease,customerFrom,customer,billStatus,constractStatus,tedian,district,value,userData,modal,roomInfo,room,buildingInfo,layerInfo,layer,build} = this.state;
 
         //弹框
         let modalBackgroundStyle = {
@@ -1073,6 +1083,8 @@ class A extends Component {
                                             </View>
                                         )
                                         :modal=='查看报价'?(
+
+                                        <ScrollView>
                                             <View style={{paddingRight:20}}>
                                                 <View style={styles.a}>
                                                     <Text style={{flex:1}}>客户来源:</Text>
@@ -1157,15 +1169,30 @@ class A extends Component {
 
 
 
-                                                {this.state.flag&&
-                                                <View style={{alignItems:"center",marginTop:10}}>
-                                                    <Text>押{price.pledge}付{price.payMonth}   <Text style={{color:"#0074c3"}}>{price.rentPrice}元/月</Text></Text>
-                                                </View>}
+                                                {/*{this.state.flag&&*/}
+                                                {/*<View style={{alignItems:"center",marginTop:10}}>*/}
+                                                {/*<Text>押{price.pledge}付{price.payMonth}   <Text style={{color:"#0074c3"}}>{price.rentPrice}元/月</Text></Text>*/}
+                                                {/*</View>}*/}
+
+                                                {this.state.flag&&rentPrice.map((item,index)=>
+                                                    <View key={index} style={{flexDirection:"row",padding:10,borderBottomWidth: 1,borderBottomColor:"#f0f0f0"}}>
+                                                        <View style={{flex:3,alignItems:"center",justifyContent:"center"}}>
+                                                            <Text style={{color:"grey"}}>{item.planName}:</Text>
+                                                        </View>
+                                                        <View style={{flex:2,alignItems:"center",justifyContent:"center"}}>
+                                                            <Text>押{item.pledge}付{item.payMonth}</Text>
+                                                            <Text style={{color:"#0074c3",marginTop:5}}>{item.rentPrice}元/月</Text>
+                                                        </View>
+                                                    </View>
+                                                )
+                                                }
 
 
 
 
                                             </View>
+                                        </ScrollView>
+
                                         ):
                                         (
 

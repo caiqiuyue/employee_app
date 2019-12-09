@@ -3,7 +3,7 @@ import {FlatList,View,DeviceEventEmitter, ScrollView,Text, TouchableHighlight, T
 
 import Dimensions from "Dimensions";
 import axios from "../../axios";
-import {Carousel,Toast} from 'antd-mobile'
+import {Carousel, DatePicker, Toast} from 'antd-mobile'
 import shaixuan from "../HomePage/style/shaixuan.png";
 import s1 from "../HomePage/style/234.png";
 import close from "../HomePage/style/close.png";
@@ -88,8 +88,10 @@ class Mine extends React.Component {
             ],
             roomStatu:0,
             modal:'',
-            pics:[]
-
+            pics:[],
+            date1:new Date(moment(new Date()).subtract(1, 'month')),
+            date2:new Date(),
+            toast:false
 
         }
 
@@ -97,6 +99,67 @@ class Mine extends React.Component {
         this.roomNo='';
 
 
+    }
+
+    changeDate1=(date)=>{
+
+        let {date1,date2} = this.state
+
+        let flag = moment(date).isBefore(date2);
+        if(flag){
+            this.setState({date1:date})
+        }else {
+            this.setState({
+                toast:true,
+                toastDate:1
+            },()=>{
+                this.timer = setTimeout(() => {
+                    this.setState({
+                        toast:false,
+                    })
+                }, 1000);
+            })
+        }
+
+
+
+
+
+
+    }
+
+    changeDate2=(date)=>{
+
+        let {date1,date2} = this.state;
+
+        let flag = moment(date1).isBefore(date);
+
+
+        if(flag){
+            this.setState({date2:date})
+        }else {
+            this.setState({
+                toast:true,
+                toastDate:2
+            },()=>{
+                this.timer = setTimeout(() => {
+                    this.setState({
+                        toast:false,
+                    })
+                }, 1000);
+            })
+        }
+
+
+
+    }
+
+    submitGetMeter = ()=>{
+        this.setState({
+            modalVisible: false,
+        },()=>{
+            this.onRefresh()
+        })
     }
 
     //查询房间信息
@@ -212,8 +275,13 @@ class Mine extends React.Component {
 
     getMeter = ()=>{
 
+
         axios.post(`/employee/getCheckRoom`, {
             hotelNo:this.props.reduxData.hotelNo,
+            roomNo:this.state.screenRoomNo,
+            beginDate:moment(this.state.date1).format('YYYY-MM-DD'),
+            endDate:moment(this.state.date2).format('YYYY-MM-DD'),
+
 
         })
             .then((response) =>{
@@ -223,25 +291,26 @@ class Mine extends React.Component {
                     bb:true,
                     refreshing:false
                 },()=>{
-                    if(response.data.code==0&&response.data.data.length>0){
+                    if(response.data.code==0){
 
-                        response.data.data.map(item=>{
-                            if(item.images!=''){
-                                item.images = item.images.split(',')
-                            }else {
-                                item.images = []
-                            }
-                        })
-
-                        console.log(response.data.data);
+                        let data = response.data.data
+                        if(data.length>0){
+                            data.map(item=>{
+                                if(item.images!=''){
+                                    item.images = item.images.split(',')
+                                }else {
+                                    item.images = []
+                                }
+                            })
+                        }
 
                         this.setState({
-                            menterData:response.data.data
+                            menterData:data
                         })
 
 
 
-                    }else  if(response.data.code==1){
+                    }else{
                         Toast.info(response.data.message,1)
                     }
                 })
@@ -272,7 +341,7 @@ class Mine extends React.Component {
 
     componentWillMount(){
 
-        
+
 
     }
 
@@ -386,13 +455,21 @@ class Mine extends React.Component {
         if(roomInfo.images.length==1){
             pics.push(roomInfo.images[0])
         }
-        
+
         console.log(roomInfo.images.length,'roomInfo.images.length');
 
         this.setState({
             picsIndex:index,
             modal:'查看图片',
             pics:pics
+        })
+    }
+
+    screening = ()=>{
+        this.setState({
+            modalVisible: true,
+            modal:'筛选',
+            screenRoomNo:'',
         })
     }
 
@@ -412,7 +489,7 @@ class Mine extends React.Component {
                 overflow:"hidden"}
             : null;
 
-
+        let maxDate2 = new Date();
 
 
         return (
@@ -496,6 +573,99 @@ class Mine extends React.Component {
 
 
                                             }
+                                        </View>:this.state.modal=='筛选'?
+                                        <View>
+
+                                            {
+                                                this.state.toast&&
+                                                <View style={{position:"absolute",top:'40%',left:"30%",backgroundColor:'rgba(0, 0, 0, 0.5)',padding:3,zIndex:999}}>
+                                                    <Text style={{color:"#fff"}}>{this.state.toastDate==1?'开始日期不能比结束日期小':'结束日期不能比开始日期小'}</Text>
+                                                </View>
+                                            }
+
+
+
+
+                                            <View style={{paddingRight:20}}>
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>房间号:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+                                                        <TextInput
+                                                            placeholder={"房间号"}
+                                                            style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                            underlineColorAndroid="transparent"
+                                                            onChangeText={(screenRoomNo) => this.setState({screenRoomNo})}
+                                                        >
+                                                        </TextInput>
+                                                    </View>
+                                                </View>
+
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>开始时间:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+
+                                                        <DatePicker
+                                                            extra="请选择开始日期"
+                                                            format={val => moment(val).format("YYYY-MM-DD")}
+                                                            value={this.state.date1}
+                                                            mode="date"
+                                                            maxDate={maxDate2}
+                                                            // onChange={date1 => {this.changeDate1(date1)}}
+                                                            onOk={date1 => {this.changeDate1(date1)}}
+                                                            // onOk={date1 => this.setState({date1},()=>{this.getAll()})}
+                                                        >
+                                                            <RoomInfo></RoomInfo>
+                                                        </DatePicker>
+
+
+
+                                                    </View>
+
+                                                </View>
+
+
+                                                <View style={styles.a}>
+                                                    <Text style={{flex:1}}>结束时间:</Text>
+                                                    <View style={[styles.b,{flex:3}]}>
+
+                                                        <DatePicker
+                                                            extra="请选择结束日期"
+                                                            format={val => moment(val).format("YYYY-MM-DD")}
+                                                            value={this.state.date2}
+                                                            mode="date"
+                                                            maxDate={maxDate2}
+                                                            // onChange={date2 => {this.changeDate2(date2)}}
+                                                            onOk={date2 => {this.changeDate2(date2)}}
+                                                            // onOk={date2 => this.setState({date2},()=>{this.getAll()})}
+                                                        >
+                                                            <RoomInfo></RoomInfo>
+                                                        </DatePicker>
+
+
+
+                                                    </View>
+
+                                                </View>
+
+
+
+
+                                                <View style={{alignItems:"center",marginTop:10}}>
+                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                            alignItems:"center"
+                                                        }} onPress={this.submitGetMeter}>
+                                                            <Text
+                                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                确定
+                                                            </Text>
+                                                        </TouchableHighlight>
+                                                    </LinearGradient>
+                                                </View>
+
+                                            </View>
                                         </View>:
                                         <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
                                             <View style={{padding:10}}>
@@ -865,14 +1035,26 @@ class Mine extends React.Component {
                         :
                         <View>
 
+                            <View style={{flexDirection:"row-reverse",margin:10}}>
+                                <TouchableHighlight underlayColor="transparent" onPress={this.screening}>
+                                    <View><Image style={{height:25,width:25}} source={shaixuan}/></View>
+                                </TouchableHighlight>
+                            </View>
+
 
                             <View style={{
                                 ...Platform.select({
+                                    // android:{
+                                    //     paddingBottom:120,
+                                    // },
+                                    // ios:{
+                                    //     paddingBottom:100,
+                                    // }
                                     android:{
-                                        paddingBottom:120,
+                                        paddingBottom:220,
                                     },
                                     ios:{
-                                        paddingBottom:100,
+                                        paddingBottom:200,
                                     }
                                 }),
                             }}>
@@ -886,7 +1068,7 @@ class Mine extends React.Component {
                                     refreshing={this.state.refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
                                     keyExtractor={(item,index)=>`${index}`}
                                     renderItem={({item,index})=>(
-                                        <View key={index}  style={[styles.d,styles.e,]}>
+                                        <View key={index}  style={[styles.d,styles.e,{borderTopWidth:index==0?1:0,borderTopColor:index==0?"#ccc":'#fff'}]}>
 
                                             <View  style={[styles.aaa,{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                 <Text style={{fontSize:18,fontWeight:"bold"}}>{item.roomNo}</Text>

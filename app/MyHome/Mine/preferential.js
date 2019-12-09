@@ -44,6 +44,8 @@ class Mine extends React.Component {
             padd:100,
         }
 
+        this.hotelName = ''
+
     }
 
 
@@ -134,6 +136,32 @@ class Mine extends React.Component {
         //读取
         this.getCouponTemplate();
         this.getCouponHistory();
+        //读取
+        storage.load({
+            key: 'username',
+            // autoSync(默认为true)意味着在没有找到数据或数据过期时自动调用相应的sync方法
+            autoSync: false
+        }).then(ret => {
+
+            console.log(ret);
+
+            let aaa = ret.hotelList.filter(_item=>{
+                return _item.hotelNo==this.props.reduxData.hotelNo
+            })
+
+            this.hotelName=aaa[0].hotelName
+
+        }).catch(err => {
+            //如果没有找到数据且没有sync方法，
+            //或者有其他异常，则在catch中返回
+            console.warn(err.message);
+            switch (err.name) {
+                case 'NotFoundError':
+                    break;
+                case 'ExpiredError':
+                    break;
+            }
+        });
 
 
     }
@@ -191,14 +219,15 @@ class Mine extends React.Component {
                 this.setState({
                     bb:true
                 },()=>{
-                    if(response.data.code==0&&response.data.data&&response.data.data.length>0){
+                    if(response.data.code==0){
+                        if(response.data.data&&response.data.data.length>0){
+                            this.setState({
+                                couponList:response.data.data
+                            })
+                        }
 
-                        this.setState({
-                            couponList:response.data.data
-                        })
 
-
-                    }else if(response.data.code==1){
+                    }else{
                         Toast.info(response.data.message,1)
                     }
                 })
@@ -252,6 +281,7 @@ class Mine extends React.Component {
 
     walletSelected=()=>{
 
+        Toast.loading('loading')
         let {confId,amount,phone,couponsData} = this.state;
         axios.post(`/coupon/grantCoupon`, {
             phoneNo:phone,
@@ -261,6 +291,7 @@ class Mine extends React.Component {
 
         })
             .then((response) =>{
+                Toast.hide()
                 console.log(response,'确认发放优惠券');
 
 
@@ -309,7 +340,7 @@ class Mine extends React.Component {
         }
 
 
-        Alert.alert('确认发放','确认',
+        Alert.alert('确认',`确认发送${amount}张吗`,
             [
                 {text:"取消", onPress:this.cancelSelected},
                 {text:"确认", onPress:this.walletSelected}
@@ -329,6 +360,41 @@ class Mine extends React.Component {
 
     noRepeat=()=>{
         Toast.info('已发送，不可重复发送',1);
+    }
+
+
+    deleteCoupons = (item)=>{
+
+
+
+        console.log(item)
+        Alert.alert('删除','确认删除优惠券吗',
+            [
+                {text:"取消", onPress:this.cancelSelected},
+                {text:"确认", onPress:()=>{
+                        Toast.loading('loading')
+                        axios.post(`/coupon/delCoupon`, {
+                            phoneNo:item.phoneNo,
+                            createTime:item.createTime,
+                            hotelNo:this.props.reduxData.hotelNo
+
+                        })
+                            .then((response) =>{
+                                Toast.hide()
+                                console.log(response,'确认删除');
+
+                                Toast.info(response.data.code==0?'删除成功':response.data.message,2);
+
+                                this.getCouponHistory()
+
+                            })
+                            .catch((error)=> {
+                                console.log(error);
+                            })
+                    }}
+            ],
+            { cancelable: false }
+        );
     }
 
 
@@ -369,6 +435,11 @@ class Mine extends React.Component {
 
                             <ScrollView>
                                 <View style={{padding:10,paddingBottom:this.state.padd}}>
+
+                                    <View style={{alignItems:"center",marginTop:10}}>
+                                        <Text style={{fontSize:18,fontWeight:"bold",color:"#0074c3"}}>{this.hotelName}</Text>
+                                    </View>
+
                                     <View style={{}}>
 
                                         {
@@ -535,7 +606,10 @@ class Mine extends React.Component {
                                     <View style={[styles.aaa,{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                         <Text>已使用</Text>
                                         <Text  style={{marginTop:5}}><Text style={{fontSize:18,fontWeight:"bold"}}>{item.useCount}</Text>张</Text>
-                                    </View>
+
+                                        {!item.useCount&&<Text onPress={()=>{this.deleteCoupons(item)}} style={{marginTop:5,fontWeight:"bold",color:"red"}}>删除</Text>
+                                        }
+                                        </View>
 
 
 

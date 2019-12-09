@@ -65,12 +65,12 @@ class Mine extends React.Component {
         this.state={
             handelMsg:[
                 {
-                    value:"未审批",
+                    value:"未完成",
                     flag:true
                 },
 
                 {
-                    value:"已审批",
+                    value:"已完成",
                     flag:false
                 },
 
@@ -168,7 +168,7 @@ class Mine extends React.Component {
             piker2:[],
             piker1Val:[''],
             piker2Val:[''],
-            changeMsg:"未审批",
+            changeMsg:"未完成",
             refreshing:false,
             animationType: 'none',//none slide fade
             modalVisible: false,//模态场景是否可见
@@ -835,7 +835,7 @@ class Mine extends React.Component {
 
                                 <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
 
-                                    <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>审批</Text></View>
+                                    <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}></Text></View>
 
 
 
@@ -1270,7 +1270,7 @@ class Mine extends React.Component {
 
 
                 {
-                    changeMsg=='未审批'?
+                    changeMsg=='未完成'?
 
                         <View>
                             <View style={{
@@ -1317,7 +1317,7 @@ class Mine extends React.Component {
 
 
                                                 <View style={[{flex:1,alignItems:"center",justifyContent:"center"}]}>
-                                                    <Text style={{color:this.approvalStatusColor[item.approvalStatus]}}><Text style={{color:"grey"}}>审批--</Text>{this.approvalStatus[item.approvalStatus]}</Text>
+                                                    <Text style={{color:this.approvalStatusColor[item.approvalStatus]}}>{this.approvalStatus[item.approvalStatus]}</Text>
                                                     {isBoss&&<TouchableHighlight onPress={()=>{this.getApprovalById(item.approvalId)}} underlayColor="transparent" style={{marginTop:5}}><Text style={{color:"red"}}>处理</Text></TouchableHighlight>}
                                                 </View>
 

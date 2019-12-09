@@ -44,7 +44,7 @@ const SimpleApp = StackNavigator({
     Approval:{
         screen: Approval,
         navigationOptions: {
-            headerTitle:'审批',
+            headerTitle:'系统工具',
             headerBackTitle:null,
             headerStyle: {
                 backgroundColor: '#0074c3'

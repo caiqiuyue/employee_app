@@ -189,7 +189,7 @@ export default class Mine extends React.Component {
                 <TouchableHighlight onPress={this.approval} underlayColor="#f0f0f0">
                     <View style={styles.aa}>
                         <View style={styles.imgView}><Image style={styles.img3} source={approval}/></View>
-                        <Text>审批中心</Text>
+                        <Text>系统工具</Text>
                         <View style={{flex:1}}></View>
                         <View>
                             <Image style={styles.img2} source={right}/>

@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import {
     Linking, DeviceEventEmitter, View, Text, Image, TextInput, Modal, Platform, StyleSheet, FlatList, ScrollView,
-    TouchableHighlight, Dimensions, Keyboard,Alert
+    TouchableHighlight, Dimensions, Keyboard, Alert, PermissionsAndroid, ActivityIndicator
 } from 'react-native';
 
 import close from "../HomePage/style/close.png";
@@ -11,6 +11,7 @@ import add from "./style/add.png";
 
 import {Picker,DatePicker,Toast} from 'antd-mobile'
 import axios from "../../axios";
+import axioss from "axios";
 
 import callIcon from '../HomePage/style/60.png'
 
@@ -21,6 +22,44 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {setHotelNo} from "../../components/active/reducer";
 import LinearGradient from 'react-native-linear-gradient';
+import ImagePicker from "react-native-image-picker";
+let city = {
+    11: "北京市",
+    12: "天津市",
+    13: "河北省",
+    14: "山西省",
+    15: "内蒙古自治区",
+    21: "辽宁省",
+    22: "吉林省",
+    23: "黑龙江省",
+    31: "上海市",
+    32: "江苏省",
+    33: "浙江省",
+    34: "安徽省",
+    35: "福建省",
+    36: "江西省",
+    37: "山东省",
+    41: "河南省",
+    42: "湖北省",
+    43: "湖南省",
+    44: "广东省",
+    45: "广西自治区",
+    46: "海南省",
+    50: "重庆市",
+    51: "四川省",
+    52: "贵州省",
+    53: "云南省",
+    54: "西藏自治区",
+    61: "陕西省",
+    62: "甘肃省",
+    63: "青海省",
+    64: "宁夏自治区",
+    65: "新疆自治区",
+    71: "台湾省",
+    81: "香港特别行政区",
+    82: "澳门特别行政区",
+    91: "国外 "
+};
 const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
@@ -60,10 +99,23 @@ const RoomInfo = props => {
             price:0,
             apm: null,
             modal: null,
+            uri1:'',
+            uri3:'',
+            uri2:'',
+            uri4:'',
+            cardCode:'',
+            cardCode2:'',
+            cardAddress:'',
+            cardAddress2:'',
+            cardImg:'',
+            cardImg2:'',
+            uploadIdCardType: false,
+            uploadIdCardType2: false,
             username: '',
             username2: '',
             phone: '',
             phone2: '',
+            showLoading:false,
             date: new Date(),
             rentInDate: new Date(),
             rentOutDate: null,
@@ -85,6 +137,7 @@ const RoomInfo = props => {
             registerList: [],
             yudingData: {},
             orderList: [],
+
             yudingState: false,
             qianyueData: {},
             chechinList: [],
@@ -243,6 +296,182 @@ const RoomInfo = props => {
     }
 
 
+
+     permissions = async(uri)=>{
+
+         const check =  await PermissionsAndroid.check(
+             PermissionsAndroid.PERMISSIONS.CAMERA)
+         console.log(check,"checkcheck")
+
+         if(check){
+             this.uploadPic(uri)
+         }else {
+             const granted = await PermissionsAndroid.request(
+                 PermissionsAndroid.PERMISSIONS.CAMERA,
+                 {
+                     title: '申请拍照和照片权限',
+                     message:
+                         'app申请拍照和照片权限，请开通此权限，否则不能上传图片',
+                     // buttonNeutral: '等会再问我',
+                     buttonNegative: '拒绝',
+                     buttonPositive: '允许',
+                 },
+             )
+             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                 console.log("You can use the camera")
+             } else {
+                 console.log("Camera permission denied")
+             }
+         }
+     }
+
+     //上传图片
+     uploadPic = (item) => {
+
+         const options = {
+             title: '选择图片',
+             cancelButtonTitle: '取消',
+             takePhotoButtonTitle: '拍照',
+             chooseFromLibraryButtonTitle: '选择照片',
+             cameraType: 'back',
+             mediaType: 'photo',
+             videoQuality: 'high',
+             durationLimit: 10,
+             maxWidth: 600,
+             maxHeight: 400,
+             quality: 1,
+             angle: 0,
+             allowsEditing: false,
+             noData: false,
+             storageOptions: {
+                 skipBackup: true
+             }
+         };
+
+         ImagePicker.showImagePicker(options, (response) => {
+             console.log('Response = ', response);
+
+
+             if (response.didCancel) {
+                 console.log('User cancelled photo picker');
+             }
+             else if (response.error) {
+                 console.log('ImagePicker Error: ', response.error);
+             }
+             else if (response.customButton) {
+                 console.log('User tapped custom button: ', response.customButton);
+             }
+             else {
+
+                 console.log(response.data);
+
+                 if(item==1){
+                     this.setState({
+                         uri1: `data:image/png;base64,${response.data}`
+                     });
+
+
+
+                 }
+
+                 if(item==2) {
+                     this.setState({
+                         uri2: `data:image/png;base64,${response.data}`
+                     });
+                 }
+
+                 if(item==3) {
+                     this.setState({
+                         uri3: `data:image/png;base64,${response.data}`
+                     });
+                 }
+
+                 if(item==4) {
+                     this.setState({
+                         uri4: `data:image/png;base64,${response.data}`
+                     });
+                 }
+
+
+             }
+         });
+
+     }
+
+
+     loadingType = (showLoading)=>{
+        this.setState({showLoading})
+     }
+
+
+     submitIdCard = (item)=>{
+         let {uri1,uri2,uri3,uri4} = this.state;
+         console.log(item,'12345')
+
+
+         if(!item&&!uri1){
+
+             alert('请上传租客身份证正面照')
+             return
+         }
+
+         if(!item&&!uri2){
+
+             alert('请上传租客身份证反面照')
+             return
+         }
+
+         if(item&&!uri3){
+
+             alert('请上传租客2身份证正面照')
+             return
+         }
+
+         if(item&&!uri4){
+
+             alert('请上传租客2身份证反面照')
+             return
+         }
+
+
+         let data = !item?{idCard1:uri1,
+                 idCard2:uri2,}:{idCard1:uri3,
+             idCard2:uri4,}
+
+
+
+
+         this.loadingType(true)
+
+         axioss.post('https://47.95.116.56:8443/file_upload/addCardFiles', data)
+             .then( (response)=> {
+                 console.log(response);
+                 this.loadingType(false)
+                 if(response.data.code==0){
+
+                     let a = response.data.idCard.substring(0,2)
+
+
+
+                     alert(`验证通过,您已上传成功,该身份证归属省为${city[a-0]}`)
+                     this.setState(
+                         !item?
+                         {username:response.data.cardName,cardCode:response.data.idCard,cardAddress:response.data.addressWords,cardImg:response.data.msg}
+                         :
+                             {username2:response.data.cardName,cardCode2:response.data.idCard,cardAddress2:response.data.addressWords,cardImg2:response.data.msg}
+                     )
+
+
+                 }else{
+                     this.setState(!item?{uri1:'',uri2:''}:{uri3:'',uri4:''})
+                     alert(response.data.msg==''?response.data:response.data.msg);
+                 }
+
+             })
+             .catch(function (error) {
+                 console.log(error);
+             });
+     }
 
 
     //获取全部单
@@ -736,7 +965,7 @@ const RoomInfo = props => {
 
             let {roomtype,roomtypeList} = this.state;
             let ccc = [];
-            
+
             console.log(this.state.roomtypeList,'roomtypeList');
             console.log(this.state.roomtype,'roomtype');
 
@@ -804,11 +1033,11 @@ const RoomInfo = props => {
 
     //退租日期加减
     setRentOutDate = (_item={})=>{
-        
+
         console.log(_item,'setRentOutDate');
 
         let {rentInDate,lease,rentOutDate} = this.state;
-        
+
         console.log(rentInDate,lease[0],lease[0]-0,'lease[0],');
 
         rentOutDate = moment(rentInDate).add(lease[0]-0, 'months').subtract(1, 'days');
@@ -915,7 +1144,7 @@ const RoomInfo = props => {
 
     //获取租金方案
     getRentPolicy = (_item={})=>{
-        
+
         console.log(_item,'123456788765432sdfghj');
 
         let {room,rentInDate,customer,lease} = this.state;
@@ -1043,10 +1272,24 @@ const RoomInfo = props => {
             this.disabled=true;
         }
 
+
+
         this.setState(
             {
                 phone: item.phoneNo || "",
                 username:item.bookUser || "",
+                uri1:item.cardImg?item.cardImg.split(',')[0]:'',
+                uri2:item.cardImg?item.cardImg.split(',')[1]:'',
+                uri3:'',
+                uri4:'',
+                uploadIdCardType2:false,
+                uploadIdCardType:false,
+                cardCode:item.cardCode ||'',
+                cardCode2:'',
+                cardAddress:item.cardAddress ||'',
+                cardAddress2:'',
+                cardImg:item.cardImg ||'',
+                cardImg2:'',
                 phone2:"",
                 username2:"",
                 sale: this.state.saleList.filter(_item => _item.label == item.saleName)[0] ? [this.state.saleList.filter(_item => _item.label == item.saleName)[0].value] : [],
@@ -1112,11 +1355,11 @@ const RoomInfo = props => {
 
     //确定添加预定
     addOrder=()=>{
-        
-        let {hotelNo,customer,lease,username,phone,rentInDate,rentOutDate,roomtype,room,rentPolicy,sale,daikanren,amountType,note,deposit} = this.state;
+
+        let {cardImg,cardCode,cardAddress,hotelNo,customer,lease,username,phone,rentInDate,rentOutDate,roomtype,room,rentPolicy,sale,daikanren,amountType,note,deposit} = this.state;
 
         console.log(sale,'sale');
-        
+
         if(username.trim()==''){
             alert('请输入租客姓名');
             return
@@ -1124,6 +1367,11 @@ const RoomInfo = props => {
 
         if(phone.trim()==''){
             alert('请输入租客手机号');
+            return
+        }
+
+        if(cardCode.trim()==''){
+            alert('请输入租客身份证号');
             return
         }
 
@@ -1165,14 +1413,15 @@ const RoomInfo = props => {
         }
 
 
+
         this.setState({
             modalVisible: false
         },()=>{
 
             let {handelMsg,changeMsg} = this.state;
 
-            axios.post(`/checkin/saveApaOrder`, {
-                name:username,
+            let data = {
+                name:username,cardCode,
                 phoneNo:phone,
                 comefrom:customer[0],
                 amountType:amountType[0]-0,
@@ -1187,7 +1436,14 @@ const RoomInfo = props => {
                 roomNo:room[0],
                 checkinDate:moment(rentInDate).format('YYYY-MM-DD'),
                 checkoutDate:moment(rentOutDate).format('YYYY-MM-DD'),
-            })
+            }
+
+            if(cardAddress){
+                data.cardAddress = cardAddress
+                data.cardImg = cardImg
+            }
+
+            axios.post(`/checkin/saveApaOrder`, data)
                 .then((response) =>{
                     console.log(response,'添加预定');
                     if(response.data.code==0){
@@ -1226,7 +1482,7 @@ const RoomInfo = props => {
     //确定添加签约
     addCheckin=()=>{
 
-        let {id,username2,phone2,hotelNo,customer,lease,username,phone,rentInDate,rentOutDate,roomtype,room,rentPolicy,sale,daikanren,amountType,note,deposit} = this.state;
+        let {cardImg,cardCode,cardAddress,cardImg2,cardCode2,cardAddress2,id,username2,phone2,hotelNo,customer,lease,username,phone,rentInDate,rentOutDate,roomtype,room,rentPolicy,sale,daikanren,amountType,note,deposit} = this.state;
 
         console.log(sale,'sale');
 
@@ -1242,6 +1498,11 @@ const RoomInfo = props => {
 
         if(phone.trim()==''){
             alert('请输入租客手机号');
+            return
+        }
+
+        if(cardCode.trim()==''){
+            alert('请输入租客身份证号');
             return
         }
 
@@ -1276,16 +1537,18 @@ const RoomInfo = props => {
         }
 
 
-        if(this.state.addMan){
-            if(username2.trim()==''){
-                alert('请输入租客2姓名');
-                return
-            }
+        if(this.state.addMan&&username2.trim()==''){
+            alert('请输入租客2姓名');
+            return
+        }
 
-            if(phone2.trim()==''){
-                alert('请输入租客2手机号');
-                return
-            }
+        if(this.state.addMan&&phone2.trim()==''){
+            alert('请输入租客2手机号');
+            return
+        }
+        if(this.state.addMan&&cardCode2.trim()==''){
+            alert('请输入租客身份证号');
+            return
         }
 
 
@@ -1304,7 +1567,7 @@ const RoomInfo = props => {
                 return (item.feeCode!="100000"&&item.feeCode!="100101")
             })
         }
-        
+
 
 
 
@@ -1317,17 +1580,29 @@ const RoomInfo = props => {
         }
 
 
+        let aaa = {customerName:username,
+            phoneNo:phone,
+            idcardNo:cardCode,}
+
+        if(cardAddress){
+            aaa.address  = cardAddress
+            aaa.interest  = cardImg
+        }
+
         let customerList = [
-            {
-                customerName:username,
-                phoneNo:phone,
-            }
+            aaa
         ]
 
         if(this.state.addMan){
             let a = {
                 customerName:username2,
                 phoneNo:phone2,
+                idcardNo:cardCode2,
+            }
+
+            if(cardAddress2){
+                a.address  = cardAddress2
+                a.interest  = cardImg2
             }
 
             customerList.push(a)
@@ -1687,7 +1962,7 @@ const RoomInfo = props => {
                 })
         });
 
-        
+
     }
 
 
@@ -1837,7 +2112,7 @@ const RoomInfo = props => {
 
 
 
-        
+
     };
 
 
@@ -1878,7 +2153,7 @@ const RoomInfo = props => {
     }
 
     render(){
-        let{rentPolicyList,rentPolicy,roomList,room,roomtype,roomtypeList,rentOutDate,rentInDate,leaseList,lease,realName,yixiangList,yixiang,qianyueData,chechinList,sale,saleList,customer,customerFrom,dateStatus,yudingData,orderList,registerList,takerList,daikanren,handelMsg,changeMsg,yuyueData,logData,refreshing} = this.state;
+        let{uploadIdCardType2,uploadIdCardType,rentPolicyList,rentPolicy,roomList,room,roomtype,roomtypeList,rentOutDate,rentInDate,leaseList,lease,realName,yixiangList,yixiang,qianyueData,chechinList,sale,saleList,customer,customerFrom,dateStatus,yudingData,orderList,registerList,takerList,daikanren,handelMsg,changeMsg,yuyueData,logData,refreshing} = this.state;
 
 
         //弹框
@@ -2238,8 +2513,10 @@ const RoomInfo = props => {
 
                                                     <View style={{paddingRight:20,marginTop:10,paddingBottom:300}}>
 
+
+
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>客户来源:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>客户来源:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
 
@@ -2263,7 +2540,7 @@ const RoomInfo = props => {
 
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>租期:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>租期:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
                                                                 <Picker
@@ -2283,22 +2560,10 @@ const RoomInfo = props => {
 
                                                         </View>
 
-                                                        <View style={styles.a}>
-                                                            <Text style={{flex:1}}>租客姓名:</Text>
-                                                            <View style={[styles.b,{flex:3}]}>
-                                                                <TextInput
-                                                                    placeholder={this.state.username?this.state.username:'姓名'}
-                                                                    // value={this.state.username}
-                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
-                                                                    underlineColorAndroid="transparent"
-                                                                    onChangeText={(name) => this.setState({username:name})}
-                                                                >
-                                                                </TextInput>
-                                                            </View>
-                                                        </View>
+
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>租客手机:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>租客手机:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={this.state.phone?this.state.phone:'手机号'}
@@ -2314,7 +2579,120 @@ const RoomInfo = props => {
 
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>入租日期:</Text>
+                                                            <Text style={{flex:1}}>身份证:</Text>
+                                                            <View style={[styles.b,{flex:3,padding:10}]}>
+                                                                <Text onPress={()=>{this.setState({uploadIdCardType:!uploadIdCardType})}} style={{textDecorationLine:"underline"}}>{uploadIdCardType?'收起':'上传身份证并识别?'}</Text>
+                                                            </View>
+                                                        </View>
+
+                                                        {
+                                                            uploadIdCardType?
+                                                            <View>
+
+                                                                <View style={{height:210,borderWidth:5,borderColor:"#f0f0f0"}}>
+                                                                    <Image style={{height:200,width:"100%",resizeMode:"contain"}}
+                                                                           source={{uri:this.state.uri1}}
+                                                                    />
+                                                                </View>
+
+                                                                <View style={{alignItems:"center"}}>
+                                                                    <TouchableHighlight onPress={()=>{
+                                                                        // this.uploadPic(1)
+                                                                        if(Platform.OS== 'android'){
+                                                                            this.permissions(1)
+                                                                        }else {
+                                                                            this.uploadPic(1)
+                                                                        }
+                                                                    }} underlayColor="#f0f0f0" style={{marginTop:10,marginBottom:20,width:"50%",padding:5,borderRadius:5,borderWidth:1,borderColor:"#666",alignItems:"center"}}>
+                                                                        <Text style={{}}>请上传身份证正面照</Text>
+                                                                    </TouchableHighlight>
+                                                                </View>
+
+                                                                <View style={{height:210,borderWidth:5,borderColor:"#f0f0f0"}}>
+                                                                    <Image style={{height:200,width:"100%",resizeMode:"contain"}}
+                                                                           source={{uri:this.state.uri2}}
+                                                                    />
+                                                                </View>
+
+                                                                <View style={{alignItems:"center"}}>
+                                                                    <TouchableHighlight onPress={()=>{
+                                                                        // this.uploadPic(1)
+                                                                        if(Platform.OS== 'android'){
+                                                                            this.permissions(2)
+                                                                        }else {
+                                                                            this.uploadPic(2)
+                                                                        }
+                                                                    }} underlayColor="#f0f0f0" style={{marginTop:10,marginBottom:20,width:"50%",padding:5,borderRadius:5,borderWidth:1,borderColor:"#666",alignItems:"center"}}>
+                                                                        <Text style={{}}>请上传身份证反面照</Text>
+                                                                    </TouchableHighlight>
+                                                                </View>
+
+                                                                {this.state.showLoading?
+                                                                    <View style={{ alignItems: 'center', justifyContent: 'center',marginTop:5}}>
+                                                                        <ActivityIndicator
+                                                                            animating={this.state.showLoading}
+                                                                            color='grey'
+                                                                            style={{
+
+                                                                                width: 40,
+                                                                                height: 40,
+                                                                            }}
+                                                                            size="small" />
+                                                                    </View>:null}
+
+
+                                                                <View style={{alignItems:"center",marginBottom:10}}>
+
+                                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:120,borderRadius:5}}>
+                                                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                                            alignItems:"center"
+                                                                        }} onPress={()=>{this.submitIdCard(false)} }>
+                                                                            <Text
+                                                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                                确定上传
+                                                                            </Text>
+                                                                        </TouchableHighlight>
+                                                                    </LinearGradient>
+
+                                                                </View>
+
+                                                            </View>:null
+                                                        }
+
+
+                                                        <View style={styles.a}>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>租客姓名:</Text>
+                                                            <View style={[styles.b,{flex:3}]}>
+                                                                <TextInput
+                                                                    placeholder={this.state.username?this.state.username:'姓名'}
+                                                                    // value={this.state.username}
+                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                    underlineColorAndroid="transparent"
+                                                                    onChangeText={(name) => this.setState({username:name})}
+                                                                >
+                                                                </TextInput>
+                                                            </View>
+                                                        </View>
+
+                                                        <View style={styles.a}>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>身份证号:</Text>
+                                                            <View style={[styles.b,{flex:3}]}>
+                                                                <TextInput
+                                                                    placeholder={this.state.cardCode?this.state.cardCode:'身份证号'}
+                                                                    // value={this.state.username}
+                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                    underlineColorAndroid="transparent"
+                                                                    onChangeText={(name) => this.setState({cardCode:name})}
+                                                                >
+                                                                </TextInput>
+                                                            </View>
+                                                        </View>
+
+
+
+
+                                                        <View style={styles.a}>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>入租日期:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
                                                                 <DatePicker
@@ -2337,7 +2715,7 @@ const RoomInfo = props => {
                                                         </View>
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>退租日期:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>退租日期:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
                                                                 <DatePicker
@@ -2358,7 +2736,7 @@ const RoomInfo = props => {
 
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>房型:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>房型:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
 
@@ -2406,7 +2784,7 @@ const RoomInfo = props => {
                                                         </View>
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>租金方案:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>租金方案:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
 
@@ -2441,7 +2819,7 @@ const RoomInfo = props => {
 
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>销售上户:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>销售上户:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
 
@@ -2465,7 +2843,7 @@ const RoomInfo = props => {
 
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>带看人:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>带看人:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
                                                                 <Picker
@@ -2490,7 +2868,7 @@ const RoomInfo = props => {
                                                         </View>
 
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>定金类型:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>定金类型:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
 
 
@@ -2514,7 +2892,7 @@ const RoomInfo = props => {
 
 
                                                         <View style={styles.a}>
-                                                            <Text  style={{flex:1}}>定金:</Text>
+                                                            <Text  style={{flex:1}}><Text style={{color:"red"}}>*</Text>定金:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={'定金'}
@@ -2586,6 +2964,8 @@ const RoomInfo = props => {
                                                 <ScrollView style={{height:Dimensions.get('window').height-200}}>
 
                                                     <View style={{paddingRight:20,marginTop:10,paddingBottom:300}}>
+
+
 
                                                         <View style={styles.a}>
                                                             <Text style={{flex:1}}>客户来源:</Text>
@@ -2860,6 +3240,20 @@ const RoomInfo = props => {
                                                         </View>
 
                                                         <View style={styles.a}>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>身份证号:</Text>
+                                                            <View style={[styles.b,{flex:3}]}>
+                                                                <TextInput
+                                                                    placeholder={this.state.cardCode?this.state.cardCode:'身份证号'}
+                                                                    // value={this.state.username}
+                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                    underlineColorAndroid="transparent"
+                                                                    onChangeText={(name) => this.setState({cardCode:name})}
+                                                                >
+                                                                </TextInput>
+                                                            </View>
+                                                        </View>
+
+                                                        <View style={styles.a}>
                                                             <View style={{flex:1,alignItems:"center"}}>
                                                                 {}
                                                             </View>
@@ -2879,12 +3273,204 @@ const RoomInfo = props => {
 
 
 
-                                                                <TouchableHighlight underlayColor={"#fff"} onPress={()=>{this.setState({addMan:!this.state.addMan})} } style={{flex:1,alignItems:"center",justifyContent:"center"}}>
+                                                                <TouchableHighlight underlayColor={"#fff"} onPress={()=>{this.setState({addMan:!this.state.addMan,uploadIdCardType:false})} } style={{flex:1,alignItems:"center",justifyContent:"center"}}>
                                                                     <View><Image source={add} style={{width:30,height:30}}/></View>
                                                                 </TouchableHighlight>
 
                                                             </View>
                                                         </View>
+
+
+                                                        {
+                                                            this.state.uri1.indexOf('http://47.95.116.56:8080/file_upload')!=-1?
+                                                                <View>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={{flex:1}}>{}</Text>
+                                                                        <View style={[styles.b,{flex:3,padding:10}]}>
+                                                                            <Text onPress={()=>{this.setState({uploadIdCardType:!uploadIdCardType})}} style={{textDecorationLine:"underline"}}>{uploadIdCardType?'收起':'查看身份证?'}</Text>
+                                                                        </View>
+                                                                    </View>
+
+                                                                    {uploadIdCardType?
+
+                                                                        <View>
+
+                                                                            <View style={{
+                                                                                height: 210,
+                                                                                borderWidth: 5,
+                                                                                borderColor: "#f0f0f0"
+                                                                            }}>
+                                                                                <Image style={{
+                                                                                    height: 200,
+                                                                                    width: "100%",
+                                                                                    resizeMode: "contain"
+                                                                                }}
+                                                                                       source={{uri: this.state.uri1}}
+                                                                                />
+                                                                            </View>
+
+
+                                                                            <View style={{
+                                                                                height: 210,
+                                                                                borderWidth: 5,
+                                                                                borderColor: "#f0f0f0"
+                                                                            }}>
+                                                                                <Image style={{
+                                                                                    height: 200,
+                                                                                    width: "100%",
+                                                                                    resizeMode: "contain"
+                                                                                }}
+                                                                                       source={{uri: this.state.uri2}}
+                                                                                />
+                                                                            </View>
+
+
+
+
+                                                                        </View>:null
+                                                                    }
+
+
+                                                                </View>:
+                                                                <View>
+                                                                    <View style={styles.a}>
+                                                                        <Text style={{flex:1}}>{}</Text>
+                                                                        <View style={[styles.b,{flex:3,padding:10}]}>
+                                                                            <Text onPress={()=>{this.setState({uploadIdCardType:!uploadIdCardType})}} style={{textDecorationLine:"underline"}}>{uploadIdCardType?'收起':'上传身份证并识别?'}</Text>
+                                                                        </View>
+                                                                    </View>
+
+                                                                    {uploadIdCardType?
+
+                                                                        <View>
+
+                                                                            <View style={{
+                                                                                height: 210,
+                                                                                borderWidth: 5,
+                                                                                borderColor: "#f0f0f0"
+                                                                            }}>
+                                                                                <Image style={{
+                                                                                    height: 200,
+                                                                                    width: "100%",
+                                                                                    resizeMode: "contain"
+                                                                                }}
+                                                                                       source={{uri: this.state.uri1}}
+                                                                                />
+                                                                            </View>
+
+                                                                            <View style={{alignItems: "center"}}>
+                                                                                <TouchableHighlight onPress={() => {
+                                                                                    // this.uploadPic(1)
+                                                                                    if (Platform.OS == 'android') {
+                                                                                        this.permissions(1)
+                                                                                    } else {
+                                                                                        this.uploadPic(1)
+                                                                                    }
+                                                                                }} underlayColor="#f0f0f0" style={{
+                                                                                    marginTop: 10,
+                                                                                    marginBottom: 20,
+                                                                                    width: "50%",
+                                                                                    padding: 5,
+                                                                                    borderRadius: 5,
+                                                                                    borderWidth: 1,
+                                                                                    borderColor: "#666",
+                                                                                    alignItems: "center"
+                                                                                }}>
+                                                                                    <Text style={{}}>请上传身份证正面照</Text>
+                                                                                </TouchableHighlight>
+                                                                            </View>
+
+                                                                            <View style={{
+                                                                                height: 210,
+                                                                                borderWidth: 5,
+                                                                                borderColor: "#f0f0f0"
+                                                                            }}>
+                                                                                <Image style={{
+                                                                                    height: 200,
+                                                                                    width: "100%",
+                                                                                    resizeMode: "contain"
+                                                                                }}
+                                                                                       source={{uri: this.state.uri2}}
+                                                                                />
+                                                                            </View>
+
+                                                                            <View style={{alignItems: "center"}}>
+                                                                                <TouchableHighlight onPress={() => {
+                                                                                    // this.uploadPic(1)
+                                                                                    if (Platform.OS == 'android') {
+                                                                                        this.permissions(2)
+                                                                                    } else {
+                                                                                        this.uploadPic(2)
+                                                                                    }
+                                                                                }} underlayColor="#f0f0f0" style={{
+                                                                                    marginTop: 10,
+                                                                                    marginBottom: 20,
+                                                                                    width: "50%",
+                                                                                    padding: 5,
+                                                                                    borderRadius: 5,
+                                                                                    borderWidth: 1,
+                                                                                    borderColor: "#666",
+                                                                                    alignItems: "center"
+                                                                                }}>
+                                                                                    <Text style={{}}>请上传身份证反面照</Text>
+                                                                                </TouchableHighlight>
+                                                                            </View>
+
+                                                                            {this.state.showLoading ?
+                                                                                <View style={{
+                                                                                    alignItems: 'center',
+                                                                                    justifyContent: 'center',
+                                                                                    marginTop: 5
+                                                                                }}>
+                                                                                    <ActivityIndicator
+                                                                                        animating={this.state.showLoading}
+                                                                                        color='grey'
+                                                                                        style={{
+
+                                                                                            width: 40,
+                                                                                            height: 40,
+                                                                                        }}
+                                                                                        size="small"/>
+                                                                                </View> : null}
+
+
+                                                                            <View style={{
+                                                                                alignItems: "center",
+                                                                                marginBottom: 10
+                                                                            }}>
+
+                                                                                <LinearGradient
+                                                                                    colors={['#00adfb', '#00618e']}
+                                                                                    style={{
+                                                                                        width: 120,
+                                                                                        borderRadius: 5
+                                                                                    }}>
+                                                                                    <TouchableHighlight
+                                                                                        underlayColor={"transparent"}
+                                                                                        style={{
+                                                                                            padding: 10,
+                                                                                            alignItems: "center"
+                                                                                        }} onPress={()=>{this.submitIdCard(false)}}>
+                                                                                        <Text
+                                                                                            style={{
+                                                                                                fontSize: 16,
+                                                                                                textAlign: "center",
+                                                                                                color: "#fff"
+                                                                                            }}>
+                                                                                            确定上传
+                                                                                        </Text>
+                                                                                    </TouchableHighlight>
+                                                                                </LinearGradient>
+
+                                                                            </View>
+
+                                                                        </View>:null
+                                                                    }
+                                                                </View>
+                                                        }
+
+
 
                                                         {this.state.addMan&&
                                                         <View>
@@ -2896,6 +3482,20 @@ const RoomInfo = props => {
                                                                         style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                         underlineColorAndroid="transparent"
                                                                         onChangeText={(name) => this.setState({username2:name})}
+                                                                    >
+                                                                    </TextInput>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>身份证号:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <TextInput
+                                                                        placeholder={this.state.cardCode2?this.state.cardCode2:'身份证号'}
+                                                                        // value={this.state.username}
+                                                                        style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                        underlineColorAndroid="transparent"
+                                                                        onChangeText={(name) => this.setState({cardCode2:name})}
                                                                     >
                                                                     </TextInput>
                                                                 </View>
@@ -2915,12 +3515,99 @@ const RoomInfo = props => {
                                                                     </TextInput>
                                                                 </View>
                                                             </View>
+
+                                                            <View>
+                                                                <View style={styles.a}>
+                                                                    <Text style={{flex:1}}>{}</Text>
+                                                                    <View style={[styles.b,{flex:3,padding:10}]}>
+                                                                        <Text onPress={()=>{this.setState({uploadIdCardType2:!uploadIdCardType2})}} style={{textDecorationLine:"underline"}}>{uploadIdCardType2?'收起':'上传身份证?'}</Text>
+                                                                    </View>
+                                                                </View>
+
+                                                                {uploadIdCardType2?
+
+                                                                    <View>
+
+                                                                        <View style={{height:210,borderWidth:5,borderColor:"#f0f0f0"}}>
+                                                                            <Image style={{height:200,width:"100%",resizeMode:"contain"}}
+                                                                                   source={{uri:this.state.uri3}}
+                                                                            />
+                                                                        </View>
+
+                                                                        <View style={{alignItems:"center"}}>
+                                                                            <TouchableHighlight onPress={()=>{
+                                                                                // this.uploadPic(1)
+                                                                                if(Platform.OS== 'android'){
+                                                                                    this.permissions(3)
+                                                                                }else {
+                                                                                    this.uploadPic(3)
+                                                                                }
+                                                                            }} underlayColor="#f0f0f0" style={{marginTop:10,marginBottom:20,width:"50%",padding:5,borderRadius:5,borderWidth:1,borderColor:"#666",alignItems:"center"}}>
+                                                                                <Text style={{}}>请上传身份证正面照</Text>
+                                                                            </TouchableHighlight>
+                                                                        </View>
+
+                                                                        <View style={{height:210,borderWidth:5,borderColor:"#f0f0f0"}}>
+                                                                            <Image style={{height:200,width:"100%",resizeMode:"contain"}}
+                                                                                   source={{uri:this.state.uri4}}
+                                                                            />
+                                                                        </View>
+
+                                                                        <View style={{alignItems:"center"}}>
+                                                                            <TouchableHighlight onPress={()=>{
+                                                                                // this.uploadPic(1)
+                                                                                if(Platform.OS== 'android'){
+                                                                                    this.permissions(4)
+                                                                                }else {
+                                                                                    this.uploadPic(4)
+                                                                                }
+                                                                            }} underlayColor="#f0f0f0" style={{marginTop:10,marginBottom:20,width:"50%",padding:5,borderRadius:5,borderWidth:1,borderColor:"#666",alignItems:"center"}}>
+                                                                                <Text style={{}}>请上传身份证反面照</Text>
+                                                                            </TouchableHighlight>
+                                                                        </View>
+
+                                                                        {this.state.showLoading?
+                                                                            <View style={{ alignItems: 'center', justifyContent: 'center',marginTop:5}}>
+                                                                                <ActivityIndicator
+                                                                                    animating={this.state.showLoading}
+                                                                                    color='grey'
+                                                                                    style={{
+
+                                                                                        width: 40,
+                                                                                        height: 40,
+                                                                                    }}
+                                                                                    size="small" />
+                                                                            </View>:null}
+
+
+                                                                        <View style={{alignItems:"center",marginBottom:10}}>
+
+                                                                            <LinearGradient colors={['#00adfb', '#00618e']} style={{width:120,borderRadius:5}}>
+                                                                                <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                                                    alignItems:"center"
+                                                                                }} onPress={()=>{this.submitIdCard(true)} }>
+                                                                                    <Text
+                                                                                        style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                                        确定上传
+                                                                                    </Text>
+                                                                                </TouchableHighlight>
+                                                                            </LinearGradient>
+
+                                                                        </View>
+
+                                                                    </View>:null
+                                                                }
+                                                            </View>
+
+
+
+
                                                         </View>}
 
 
-                                                        <View style={styles.a}>
-                                                            <Text style={{color:"grey"}}>身份证信息请租客app上自助上传</Text>
-                                                        </View>
+                                                        {/*<View style={styles.a}>*/}
+                                                            {/*<Text style={{color:"grey"}}>身份证信息请租客app上自助上传</Text>*/}
+                                                        {/*</View>*/}
 
 
 
@@ -3154,12 +3841,9 @@ const RoomInfo = props => {
                                                     </TouchableHighlight>:
 
                                                     item.status=='已预定'?
-                                                        <TouchableHighlight  style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]} underlayColor="transparent" onPress={()=>{this.checkin(item)}}>
-                                                            <View style={{alignItems:"center",justifyContent:"center"}}>
-                                                                <Text style={{}}>{item.status}</Text>
-                                                                <Text style={{color:"red",marginTop:3}}>签约</Text>
-                                                            </View>
-                                                        </TouchableHighlight>:
+                                                        <View  style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]} >
+                                                            <Text style={{}}>{item.status}</Text>
+                                                        </View>:
 
                                                 <View style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]}>
                                                     <Text>{item.status}</Text>
@@ -3244,20 +3928,16 @@ const RoomInfo = props => {
                                                 <Text style={{marginTop:5}}><Text style={{fontSize:16,fontWeight:"bold"}}>{item.roomNo}</Text></Text>
                                             </View>
 
+                                            <View style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
+                                                {item.payState==0&&
 
-                                            {item.payState==0&&
+                                                <TouchableHighlight  style={[{alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]} underlayColor="transparent" onPress={()=>{this.payOrder(item)}}>
 
-                                            <TouchableHighlight  style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]} underlayColor="transparent" onPress={()=>{this.payOrder(item)}}>
-
-                                                <View style={{alignItems:"center",justifyContent:"center"}}>
-                                                    <Text style={{}}>未支付</Text>
-                                                    <Text style={{color:"red",marginTop:3}}>分享微信支付</Text>
-                                                </View>
-                                            </TouchableHighlight>}
-
-
-
-                                            <View style={[styles.aa,{flex:3,alignItems:"center",justifyContent:"center",borderRightColor:"#fff"}]}>
+                                                    <View style={{alignItems:"center",justifyContent:"center"}}>
+                                                        <Text style={{}}>未支付</Text>
+                                                        <Text style={{color:"red",marginTop:3}}>分享微信支付</Text>
+                                                    </View>
+                                                </TouchableHighlight>}
 
                                                 {(item.payState==1&&(item.status=='已预定'||item.status=='已排房'))&&
 
@@ -3286,6 +3966,9 @@ const RoomInfo = props => {
 
                                                 }
                                             </View>
+
+
+
 
 
                                         </View>

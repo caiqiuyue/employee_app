@@ -127,14 +127,14 @@ class Mine extends React.Component {
                     bb:true,
                     refreshing:false
                 },()=>{
-                    if(response.data.code==0&&response.data.data.length>0){
+                    if(response.data.code==0){
                         this.setState({
                             menterData:response.data.data
                         })
 
 
 
-                    }else  if(response.data.code==1){
+                    }else{
                         Toast.info(response.data.message,1)
                     }
                 })
@@ -169,14 +169,16 @@ class Mine extends React.Component {
 
 
     componentWillMount(){
-        
+
 
     }
 
     screening = ()=>{
         this.setState({
             modalVisible: true,
-            modal:'筛选'
+            modal:'筛选',
+            screenRoomNo:'',
+
         })
     }
 
@@ -1295,7 +1297,7 @@ const styles = StyleSheet.create({
     aaa:{
         paddingTop:10,paddingBottom:10,paddingLeft:3,paddingRight:3,borderRightWidth:1,borderRightColor:"#ccc",
     },
-    
+
     f:{
         flex:1,color:"grey"
     }
