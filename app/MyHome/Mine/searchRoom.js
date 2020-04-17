@@ -185,26 +185,23 @@ class Mine extends React.Component {
                 if(response.data.code==0){
                     this.aa = true;
                     if(response.data.data.customerName==undefined){
-                        Toast.info('未查到该房间号信息',1)
-                        this.setState({
-                            data:{}
-                        })
-                    }else {
+                        Toast.info('未查到该房间号信息，此次查房为入住查房',1)
 
-                        this.setState({
-                            data:response.data.data,
-                            electricity:'',
-                            water:'',
-                            hotWater:'',
-                            electricityMoney:0,
-                            waterMoney:0,
-                            hotWaterMoney:0,
-                            damages:null,
-                            note:'',
-                            roomImg:'',
-                            flag:this.roomNo==this.state.roomNo?true:false
-                        })
-                    }
+                    };
+
+                    this.setState({
+                        data:response.data.data,
+                        electricity:'',
+                        water:'',
+                        hotWater:'',
+                        electricityMoney:0,
+                        waterMoney:0,
+                        hotWaterMoney:0,
+                        damages:null,
+                        note:'',
+                        roomImg:'',
+                        flag:this.roomNo==this.state.roomNo?true:false
+                    })
 
                 }else  if(response.data.code==1){
                     Toast.info(response.data.message,1)

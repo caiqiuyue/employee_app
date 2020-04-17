@@ -168,7 +168,7 @@ const RoomInfo = props => {
             amountTypeList: [
                 {
                     value: '1',
-                    label: '订金',
+                    label: '定金',
                 },
 
                 {

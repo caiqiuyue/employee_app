@@ -58,6 +58,108 @@ const setDate = (date) => {
 
 
 };
+const leaseList = [
+    {
+        value: '12',
+        label: '一年',
+    },
+
+    {
+        value: '1',
+        label: '1个月',
+    },
+    {
+        value: '2',
+        label: '2个月',
+    },
+    {
+        value: '3',
+        label: '3个月',
+    },
+    {
+        value: '4',
+        label: '4个月',
+    },
+    {
+        value: '5',
+        label: '5个月',
+    },
+    {
+        value: '6',
+        label: '半年',
+    },
+    {
+        value: '7',
+        label: '7个月',
+    },
+    {
+        value: '8',
+        label: '8个月',
+    }, {
+        value: '9',
+        label: '9个月',
+    },
+    {
+        value: '10',
+        label: '10个月',
+    },
+    {
+        value: '11',
+        label: '11个月',
+    },
+    {
+        value: '24',
+        label: '两年',
+    },
+    {
+        value: '13',
+        label: '13个月',
+    },
+    {
+        value: '14',
+        label: '14个月',
+    },
+    {
+        value: '15',
+        label: '15个月',
+    },
+    {
+        value: '16',
+        label: '16个月',
+    },
+    {
+        value: '17',
+        label: '17个月',
+    },
+    {
+        value: '18',
+        label: '18个月',
+    },
+    {
+        value: '19',
+        label: '19个月',
+    },
+    {
+        value: '20',
+        label: '20个月',
+    },
+    {
+        value: '21',
+        label: '21个月',
+    },
+    {
+        value: '22',
+        label: '22个月',
+    },
+    {
+        value: '23',
+        label: '23个月',
+    },
+
+
+
+
+]
 
 class Mine extends React.Component {
     constructor(props) {
@@ -73,6 +175,20 @@ class Mine extends React.Component {
                     value:"已完成",
                     flag:false
                 },
+
+            ],
+
+            handelMsg2:[
+                {
+                    value:"详情",
+                    flag:true
+                },
+
+                {
+                    value:"账单",
+                    flag:false
+                },
+
 
             ],
             constractStatus:[
@@ -155,11 +271,17 @@ class Mine extends React.Component {
 
             ],
             isBoss:false,
+            checkinItem:{},
+            planList:[],
             amountJson:[],
             allFees:[],
             fees:[],
             allApply:[],
             AllAnnal:[],
+            rentPeriod:[],
+            rentPrice:'',
+            pledge:[],
+            payMonth:[],
             sortTradeData:null,
             piker1:[],
             modal:'',
@@ -169,6 +291,7 @@ class Mine extends React.Component {
             piker1Val:[''],
             piker2Val:[''],
             changeMsg:"未完成",
+            changeMsg2:"详情",
             refreshing:false,
             animationType: 'none',//none slide fade
             modalVisible: false,//模态场景是否可见
@@ -183,6 +306,7 @@ class Mine extends React.Component {
         this.approvalStatusColor = ['#00adfb' ,'grey','red' ]
         this.appovalSortData = []
         this.approvalId = ''
+        this.approvalType = ''
         this.data = ['','元','%','%','元/月']
 
     }
@@ -227,6 +351,26 @@ class Mine extends React.Component {
 
             }
 
+        })
+
+    }
+
+    handelMsg2=(item)=>{
+
+        let {handelMsg2} = this.state;
+
+        handelMsg2.map((_item)=>{
+            if(_item.value==item.value){
+                _item.flag=true;
+            }else {
+                _item.flag = false
+            }
+
+        })
+
+        this.setState({
+            handelMsg2,
+            changeMsg2:item.value
         })
 
     }
@@ -298,6 +442,15 @@ class Mine extends React.Component {
 
             }
         })
+
+        this.setState({
+            amountJson
+        })
+    }
+
+    changeAllAmountPayJson2 = (pledge)=>{
+        let {amountJson} = this.state
+        amountJson[0].pledge = pledge
 
         this.setState({
             amountJson
@@ -382,6 +535,10 @@ class Mine extends React.Component {
             piker2Val:[''],
             modal:'添加审批',
             sortTradeData:null,
+            rentPeriod:[],
+            rentPrice:'',
+            pledge:[],
+            payMonth:[],
             modalVisible:true
         },()=>{
             this.getPickerData(this.appovalSortData)
@@ -389,15 +546,35 @@ class Mine extends React.Component {
     }
 
     submitAll=()=>{
-        let {roomNo,piker1Val,piker2Val,remark,sortTradeData} = this.state
+        let {rentPeriod,rentPrice,pledge,payMonth,roomNo,piker1Val,piker2Val,remark,sortTradeData} = this.state
         if(!piker2Val[0]){
             alert('请选择审批类')
             return
         }
-        if(piker1Val[0]=="approval_check_out"&&!roomNo){
-            alert('请填写退房房间号')
+        if((piker1Val[0]=="approval_check_out"||piker1Val[0]=="approval_checkin"||piker1Val[0]=="approval_rent_policy")&&!roomNo){
+            alert('请填写房间号')
             return
         }
+
+        if(piker1Val[0]=="approval_rent_policy"&&!rentPrice){
+            alert('请填写租金')
+            return
+        }
+
+        if(piker1Val[0]=="approval_rent_policy"&&!rentPeriod[0]){
+            alert('请选择租期')
+            return
+        }
+        if(piker1Val[0]=="approval_rent_policy"&&!pledge[0]){
+            alert('请选择押金月数')
+            return
+        }
+
+        if(piker1Val[0]=="approval_rent_policy"&&!payMonth[0]){
+            alert('请选择付款月数')
+            return
+        }
+
         if(!remark){
             alert('请填写备注')
             return
@@ -412,13 +589,22 @@ class Mine extends React.Component {
             return
         }
 
-        axios.post(`/approval/addAppoval`, {
+        let data = {
             hotelNo:this.props.reduxData.hotelNo,
             approvalType:piker2Val[0],
             remark:remark,
             tradeNo:sortTradeData&&sortTradeData.length>0?sortTradeData.filter(_item => _item.flag == true)[0].orderNo:'',
             roomNo:roomNo,
-        })
+        }
+
+        if(piker1Val[0]=="approval_rent_policy"){
+           data.rentPrice = rentPrice;
+           data.rentPeriod = rentPeriod[0];
+           data.pledge = pledge[0];
+           data.payMonth = payMonth[0];
+        }
+
+        axios.post(`/approval/addAppoval`, data)
             .then((response) =>{
                 console.log(response,'添加审批');
                 if(response.data.code==0){
@@ -695,8 +881,9 @@ class Mine extends React.Component {
 
 
     //处理审批
-    getApprovalById = (id)=>{
+    getApprovalById = (id,approvalType)=>{
         this.approvalId = id
+        this.approvalType = approvalType
         this.setState({
             amountJson:[],
             fees:[],
@@ -710,15 +897,46 @@ class Mine extends React.Component {
                     console.log(response,'处理审批数据');
                     if(response.data.code==0){
                         let data = response.data.data
+                        let dataJson = response.data.json?response.data.json:{}
+
                         if(!data){
-                            Alert.alert('处理','确定处理？',
-                                [
-                                    {text:"取消", onPress:()=>{this.cancelSelecte(id)}},
-                                    {text:"驳回", onPress:()=>{this.processApproval(id,2)}},
-                                    {text:"确认", onPress:()=>{this.processApproval(id,1)}}
-                                ],
-                                { cancelable: false }
-                            );
+
+                            if(dataJson.fees){
+
+                                console.log(dataJson.fees,'dataJsondataJsondataJson')
+                                let fees = dataJson.fees?JSON.parse(dataJson.fees):[]
+                                if (fees) {
+                                    fees[0].flag=true;
+                                    this.getStatus(fees[0])
+
+                                }
+                                this.setState({
+                                    modalVisible:true,
+                                    modal:'',
+                                    amountJson:dataJson.amountJson?JSON.parse(dataJson.amountJson):[],
+                                    fees:fees,
+                                })
+                            }else if(dataJson.checkin){
+                                this.setState({
+                                    modalVisible:true,
+                                    modal:"违约退房",
+                                    checkinItem:dataJson.checkin,
+                                    planList:dataJson.planList
+
+                                })
+
+
+                            }else {
+                                Alert.alert('处理','确定处理？',
+                                    [
+                                        {text:"取消", onPress:()=>{this.cancelSelecte(id)}},
+                                        {text:"驳回", onPress:()=>{this.processApproval(id,2)}},
+                                        {text:"确认", onPress:()=>{this.processApproval(id,1)}}
+                                    ],
+                                    { cancelable: false }
+                                );
+                            }
+
                         }else{
                             let fees = data.fees?JSON.parse(data.fees):[]
                             let allFees = data.allFees?data.allFees:[]
@@ -781,7 +999,7 @@ class Mine extends React.Component {
 
     render(){
 
-        let {allFees,deductCycleStatus,feeCycleStatus,isFixStatus,constractStatus,amountJson,fees,modal,approvalData,sortTradeData,piker1Val,piker2Val,piker1,piker2,AllAnnal,isBoss,refreshing,handelMsg,changeMsg,allApply} = this.state;
+        let {rentPeriod,checkinItem,planList,pledge,payMonth,allFees,deductCycleStatus,feeCycleStatus,isFixStatus,constractStatus,amountJson,fees,modal,approvalData,sortTradeData,piker1Val,piker2Val,piker1,piker2,AllAnnal,isBoss,refreshing,handelMsg,changeMsg,handelMsg2,changeMsg2,allApply} = this.state;
 
         //弹框
         let modalBackgroundStyle = {
@@ -849,7 +1067,7 @@ class Mine extends React.Component {
                                     modal=='添加审批'?
                                         <View>
                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
-                                                <View style={{padding:10}}>
+                                                <View style={{padding:10,paddingBottom:piker1Val[0]=="approval_rent_policy"?200:10}}>
                                                     <View style={styles.a}>
                                                         <Text style={{flex:1}}>大类:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
@@ -898,9 +1116,9 @@ class Mine extends React.Component {
                                                     </View>
 
                                                     {
-                                                        piker1Val[0]=="approval_check_out"?
+                                                        (piker1Val[0]=="approval_check_out"||piker1Val[0]=="approval_checkin"||piker1Val[0]=="approval_rent_policy")?
                                                         <View style={styles.a}>
-                                                            <Text style={{flex:1}}>房间号:</Text>
+                                                            <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>房间号:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={'房间号'}
@@ -913,8 +1131,79 @@ class Mine extends React.Component {
                                                         </View>:null
                                                     }
 
+                                                    {
+                                                        piker1Val[0]=="approval_rent_policy"?
+                                                            <View>
+                                                                <View style={styles.a}>
+                                                                    <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>租金(元/月):</Text>
+                                                                    <View style={[styles.b,{flex:3}]}>
+                                                                        <TextInput
+                                                                            placeholder={'租金'}
+                                                                            keyboardType={'numeric'}
+                                                                            style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                            underlineColorAndroid="transparent"
+                                                                            onChangeText={(rentPrice) => this.setState({rentPrice})}
+                                                                        >
+                                                                        </TextInput>
+                                                                    </View>
+                                                                </View>
+
+                                                                <View style={styles.a}>
+                                                                    <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>租期:</Text>
+                                                                    <View style={[styles.b,{flex:3}]}>
+                                                                        <Picker
+                                                                            data={leaseList}
+                                                                            cols={1}
+                                                                            value={rentPeriod}
+                                                                            extra='租期'
+                                                                            // onChange={(data) => {this.setCity(data)}}
+                                                                            // onChange={data => {this.setState({sale:data})}}
+                                                                            onOk={rentPeriod => {this.setState({rentPeriod})}}
+                                                                            className="forss">
+                                                                            <RoomInfo></RoomInfo>
+                                                                        </Picker>
+                                                                    </View>
+                                                                </View>
+
+                                                                <View style={styles.a}>
+                                                                    <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>压几:</Text>
+                                                                    <View style={[styles.b,{flex:3}]}>
+                                                                        <Picker
+                                                                            data={leaseList}
+                                                                            cols={1}
+                                                                            value={pledge}
+                                                                            extra='压几'
+                                                                            // onChange={(data) => {this.setCity(data)}}
+                                                                            // onChange={data => {this.setState({sale:data})}}
+                                                                            onOk={pledge => {this.setState({pledge})}}
+                                                                            className="forss">
+                                                                            <RoomInfo></RoomInfo>
+                                                                        </Picker>
+                                                                    </View>
+                                                                </View>
+
+                                                                <View style={styles.a}>
+                                                                    <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>付几:</Text>
+                                                                    <View style={[styles.b,{flex:3}]}>
+                                                                        <Picker
+                                                                            data={leaseList}
+                                                                            cols={1}
+                                                                            value={payMonth}
+                                                                            extra='付几'
+                                                                            // onChange={(data) => {this.setCity(data)}}
+                                                                            // onChange={data => {this.setState({sale:data})}}
+                                                                            onOk={payMonth => {this.setState({payMonth})}}
+                                                                            className="forss">
+                                                                            <RoomInfo></RoomInfo>
+                                                                        </Picker>
+                                                                    </View>
+                                                                </View>
+
+                                                            </View>:null
+                                                    }
+
                                                     <View style={styles.a}>
-                                                        <Text style={{flex:1}}>备注:</Text>
+                                                        <Text style={{flex:1}}><Text style={{color:"red"}}>*</Text>备注:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <TextInput
                                                                 placeholder={'备注'}
@@ -983,19 +1272,167 @@ class Mine extends React.Component {
                                             </View>
 
                                         </View>:
+                                        modal=='违约退房'?<View>
+
+
+                                                <View style={{marginTop:10,borderTopColor:"#7ebef9",borderTopWidth:1,flexDirection:"row",justifyContent:"space-around"}}>
+                                                    {
+                                                        handelMsg2.map((item,index)=>
+
+                                                            <LinearGradient key={index} colors={[!item.flag?'#00adfb':"#fff", !item.flag?'#00618e':"#fff"]} style={{width:"50%",}}>
+                                                                <TouchableHighlight   onPress={()=>this.handelMsg2(item)} style={{padding:10,alignItems:"center",
+                                                                    // backgroundColor:!item.flag?"#f6f8fa":"#fff",
+                                                                    borderBottomWidth:1,
+                                                                    borderBottomColor:"#7ebef9",
+                                                                }} underlayColor="transparent" >
+
+                                                                    <Text style={{color:!item.flag?"#fff":"#00adfb",fontWeight:"bold"}}>{item.value}</Text>
+                                                                </TouchableHighlight>
+                                                            </LinearGradient>
+                                                        )
+                                                    }
+                                                </View>
+
+
+
+                                                <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+
+
+                                                    { changeMsg2=='详情'?
+                                                        <View>
+
+
+                                                            <View style={{marginTop:10}}>
+                                                                <View style={[styles2.d,styles2.a,styles2.e]}>
+                                                                    <Text style={[styles2.b]}>合同编号:</Text>
+                                                                    <Text style={[styles2.c]}>{checkinItem.checkinNo}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View>
+                                                                <View style={[styles2.d,styles2.a]}>
+                                                                    <Text style={[styles2.b]}>租约信息:</Text>
+                                                                    <Text style={[styles2.c,styles2.fontcolor]}>{checkinItem.rentPeriod}个月</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View>
+                                                                <View style={[styles2.d,styles2.e]}>
+                                                                    <Text style={[styles2.b]}>起租日期:</Text>
+                                                                    <Text style={[styles2.c,styles2.fontcolor]}>{checkinItem.checkinDate&&moment(checkinItem.checkinDate).format("YYYY-MM-DD")}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View>
+                                                                <View style={[styles2.d,styles2.e]}>
+                                                                    <Text style={[styles2.b]}>结束日期:</Text>
+                                                                    <Text style={[styles2.c,styles2.fontcolor]}>{checkinItem.checkoutDate&&moment(checkinItem.checkoutDate).format("YYYY-MM-DD")}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View>
+                                                                <View style={[styles2.d,styles2.e]}>
+                                                                    <Text style={[styles2.b]}>押金方式:</Text>
+                                                                    <Text style={[styles2.c,styles2.fontcolor]}>押{checkinItem.pledge}付{checkinItem.payMonth}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View>
+                                                                <View style={[styles2.d,styles2.e]}>
+                                                                    <Text style={[styles2.b]}>押金:</Text>
+                                                                    <Text style={[styles2.c,styles2.fontcolor]}>{checkinItem.deposit}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View>
+                                                                <View style={[styles2.d,styles2.e]}>
+                                                                    <Text style={[styles2.b]}>房租:</Text>
+                                                                    <Text style={[styles2.c,styles2.fontcolor]}>{checkinItem.rentPrice}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View>
+                                                                <View style={[styles2.d,styles2.e]}>
+                                                                    <Text style={[styles2.b]}>下一交租日:</Text>
+                                                                    <Text style={[styles2.c,styles2.fontcolor]}>{checkinItem.nextDate&&moment(checkinItem.nextDate).format("YYYY-MM-DD")}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                        </View>:
+
+                                                        <View>
+
+                                                            <View style={[styles2.d,styles2.e,{backgroundColor:"#ccc"}]}>
+                                                                <View style={{flex:2,alignItems:"center",justifyContent:"center"}}><Text style={{color:"#fff"}}>支付项</Text></View>
+                                                                <View style={{flex:2,alignItems:"center",justifyContent:"center"}}><Text style={{color:"#fff"}}>状态</Text></View>
+                                                                <View style={{flex:3,alignItems:"center",justifyContent:"center"}}><Text style={{color:"#fff"}}>金额</Text></View>
+                                                                <View style={{flex:4,alignItems:"center",justifyContent:"center"}}><Text style={{color:"#fff"}}>时间</Text></View>
+                                                            </View>
+
+                                                            {planList.length>0?planList.map((item,index)=>
+                                                                <View key={index} style={[styles2.d,styles2.e,{backgroundColor:index%2!=0?"#ccc":"#fff"}]}>
+                                                                    <View style={{flex:2,alignItems:"center",justifyContent:"center"}}><Text>{item.feeName}</Text></View>
+                                                                    <View style={{flex:2,alignItems:"center",justifyContent:"center"}}><Text style={{color:"red"}}>未缴费</Text></View>
+                                                                    <View style={{flex:3,alignItems:"center",justifyContent:"center"}}><Text>{item.rentPrice}元</Text></View>
+                                                                    <View style={{flex:4,alignItems:"center",justifyContent:"center"}}><Text>{item.fromDate&&moment(item.fromDate).format('YYYY-MM-DD')}至{item.toDate&&moment(item.toDate).format('YYYY-MM-DD')}</Text></View>
+                                                                </View>):null}
+                                                        </View>}
+                                                </ScrollView>
+
+                                                <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center",marginTop:10}}>
+                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                            alignItems:"center"
+                                                        }} onPress={()=>{this.processApproval(this.approvalId,2)} }>
+                                                            <Text
+                                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                驳回
+                                                            </Text>
+                                                        </TouchableHighlight>
+                                                    </LinearGradient>
+
+                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                            alignItems:"center"
+                                                        }} onPress={()=>{this.processApproval(this.approvalId,1)} }>
+                                                            <Text
+                                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                确定
+                                                            </Text>
+                                                        </TouchableHighlight>
+                                                    </LinearGradient>
+
+
+
+                                                </View>
+                                            </View>:
                                         <View>
                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
                                                 <View style={{padding:10}}>
                                                     <View style={styles.a}>
-                                                        <Text style={{flex:1}}>租期:</Text>
+                                                        <View style={{flex:1}}><Text>租期:{amountJson.length>0&&amountJson[0].rentPeriod}</Text>
+
+                                                        </View>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             {
                                                                 amountJson.length>0&&
                                                                 amountJson[0].payItems.map((item,index)=>
 
                                                                     <View style={styles.a} key={index}>
+                                                                        <Text>押:</Text>
+                                                                        <View style={[styles.b,{flex:2}]}>
+                                                                            <TextInput
+                                                                                placeholder={'租期'}
+                                                                                style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                                underlineColorAndroid="transparent"
+                                                                                value={amountJson.length>0?amountJson[0].pledge+'':''}
+                                                                                editable={this.approvalType== "临时方案添加"?true:false}
+                                                                                onChangeText={(pledge) => this.changeAllAmountPayJson2(pledge)}
+                                                                            >
+                                                                            </TextInput>
+                                                                        </View>
                                                                         <Text>付:</Text>
-                                                                        <View style={[styles.b,{flex:1}]}>
+                                                                        <View style={[styles.b,{flex:2}]}>
                                                                             <TextInput
                                                                                 placeholder={'租期'}
                                                                                 style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
@@ -1318,7 +1755,7 @@ class Mine extends React.Component {
 
                                                 <View style={[{flex:1,alignItems:"center",justifyContent:"center"}]}>
                                                     <Text style={{color:this.approvalStatusColor[item.approvalStatus]}}>{this.approvalStatus[item.approvalStatus]}</Text>
-                                                    {isBoss&&<TouchableHighlight onPress={()=>{this.getApprovalById(item.approvalId)}} underlayColor="transparent" style={{marginTop:5}}><Text style={{color:"red"}}>处理</Text></TouchableHighlight>}
+                                                    {isBoss&&<TouchableHighlight onPress={()=>{this.getApprovalById(item.approvalId,item.approvalType)}} underlayColor="transparent" style={{marginTop:5}}><Text style={{color:"red"}}>处理</Text></TouchableHighlight>}
                                                 </View>
 
                                             </View>
@@ -1429,6 +1866,36 @@ const styles = StyleSheet.create({
     aaa:{
         paddingTop:10,paddingBottom:10,paddingLeft:3,paddingRight:3,borderRightWidth:1,borderRightColor:"#ccc",
     },
+});
+const styles2 = StyleSheet.create({
+
+    a:{
+        padding:10,
+        flexDirection:"row"
+    },
+
+    d:{
+        padding:10,
+        flexDirection:"row",
+        borderBottomWidth:1,
+        borderBottomColor:"#f0f0f0"
+    },
+
+    e:{
+        backgroundColor:"#fff"
+    },
+
+    b:{
+        flex:1
+    },
+
+    c:{
+        flex:3
+    },
+
+    fontcolor:{
+        color:"grey"
+    }
 });
 
 export default connect (

@@ -919,7 +919,7 @@ class Mine extends React.Component {
                                                 value={this.state.lastEle}
                                                 keyboardType={'numeric'}
                                                 underlineColorAndroid="transparent"
-                                                editable={this.lastEle==0?true:false}
+                                                editable={!data.isElectricEdit?true:false}
                                                 onChangeText={(lastEle) => this.setLastElectricity(lastEle)}
                                                 onFocus={this.setPadd}
                                             >
@@ -995,7 +995,7 @@ class Mine extends React.Component {
                                                 value={this.state.lastWater}
                                                 keyboardType={'numeric'}
                                                 underlineColorAndroid="transparent"
-                                                editable={this.lastWater==0?true:false}
+                                                editable={!data.isWaterEdit?true:false}
                                                 onFocus={this.setPadd}
                                                 onChangeText={(lastWater) => this.setLastWater(lastWater)}
                                             >
@@ -1072,7 +1072,7 @@ class Mine extends React.Component {
                                                 keyboardType={'numeric'}
                                                 underlineColorAndroid="transparent"
                                                 onFocus={this.setPadd}
-                                                editable={this.lastHotWater==0?true:false}
+                                                editable={!data.isHotWaterEdit?true:false}
                                                 onChangeText={(lastHotWater) => this.setLastHotWater(lastHotWater)}
                                             >
                                             </TextInput>

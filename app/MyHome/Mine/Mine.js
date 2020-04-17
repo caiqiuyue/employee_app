@@ -179,7 +179,7 @@ export default class Mine extends React.Component {
                 <TouchableHighlight onPress={this.searchRoom} underlayColor="#f0f0f0">
                     <View style={styles.aa}>
                         <View style={styles.imgView}><Image style={styles.img3} source={searchRoom}/></View>
-                        <Text>退房查房</Text>
+                        <Text>查房管理</Text>
                         <View style={{flex:1}}></View>
                         <View>
                             <Image style={styles.img2} source={right}/>
