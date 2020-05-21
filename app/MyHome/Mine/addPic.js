@@ -118,9 +118,6 @@ export default class Mine extends React.Component {
         if(!this.props.aa){
             Toast.info('请确定填写的房间号',1);
             return
-        }else if(this.props.customerName==undefined){
-            Toast.info('未查到该房间号信息，请重新填写',1);
-            return
         }else {
             this.uploadPic()
         }
@@ -129,7 +126,7 @@ export default class Mine extends React.Component {
 
 
     }
-    
+
 
     // 保存图片
     download=(uri)=> {
@@ -175,7 +172,7 @@ export default class Mine extends React.Component {
 
     comfirmSelected=(item)=>{
         let {imgArr} = this.state;
-        
+
         axios.post('https://47.95.116.56:8443/file_upload/delCheckRoomImage', {
             hotelNo:this.props.hotelNo,
             roomNo:this.props.roomNo,
@@ -194,7 +191,7 @@ export default class Mine extends React.Component {
                             return _item
                         }
                     })
-                    
+
                     Toast.info('删除成功',1)
 
                     this.setState({

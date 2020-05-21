@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {FlatList,View,DeviceEventEmitter, ScrollView,Text, TouchableHighlight, TextInput,Image, Modal, StyleSheet,Platform} from 'react-native';
+import {FlatList,View,Alert, ScrollView,Text, TouchableHighlight, TextInput,Image, Modal, StyleSheet,Platform} from 'react-native';
 
 import Dimensions from "Dimensions";
 import axios from "../../axios";
@@ -200,7 +200,7 @@ class Mine extends React.Component {
                         damages:null,
                         note:'',
                         roomImg:'',
-                        flag:this.roomNo==this.state.roomNo?true:false
+
                     })
 
                 }else  if(response.data.code==1){
@@ -353,53 +353,71 @@ class Mine extends React.Component {
         }
     }
 
+    cancelSelecte=()=>{}
+    walletSelected=(data)=>{
+        axios.post(`/employee/saveCheckRoom`, data)
+            .then((response) =>{
+                console.log(response);
+                if(response.data.code==0){
+                    this.setState({
+                        data:{},
+                        electricity:'',
+                        roomNo:'',
+                        water:'',
+                        hotWater:'',
+                        electricityMoney:0,
+                        waterMoney:0,
+                        hotWaterMoney:0,
+                        damages:null,
+                        note:'',
+                        roomImg:'',
+                    })
+                }
+
+                Toast.info(response.data.code==0?'提交成功':response.data.message,1)
+
+                this.roomNo=this.state.roomNo;
+
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
     submitAll = ()=>{
 
-        let {data} = this.state;
+        let {data,roomNo,electricityMoney,damages,waterMoney,roomStatu,hotWaterMoney,roomImg,note} = this.state;
 
         if(!this.aa){
             Toast.info('请确定填写的房间号',1);
             return
-        }else if(data.customerName==undefined){
-            Toast.info('未查到该房间号信息，请重新填写',1);
-            return
         }else {
-
-            this.setState({
-                flag:true
-            },()=>{
-                axios.post(`/employee/saveCheckRoom`, {
-                    hotelNo:this.props.reduxData.hotelNo,
-                    roomNo:this.state.roomNo,
-                    electricMoney:this.state.electricityMoney-0,
-                    damageFee:this.state.damages-0,
-                    waterMoney:this.state.waterMoney-0,
-                    state:this.state.roomStatu,
-                    hotWaterMoney:this.state.hotWaterMoney-0,
-                    images:this.state.roomImg,
-                    remark:this.state.note,
+            let data = {
+                hotelNo:this.props.reduxData.hotelNo,
+                roomNo:roomNo,
+                electricMoney:electricityMoney-0,
+                damageFee:damages-0,
+                waterMoney:waterMoney-0,
+                state:roomStatu,
+                hotWaterMoney:hotWaterMoney-0,
+                images:roomImg,
+                remark:note,
+            }
 
 
-
-
-                })
-                    .then((response) =>{
-                        console.log(response);
-
-                        Toast.info(response.data.code==0?'提交成功':response.data.message,1)
-
-                        this.roomNo=this.state.roomNo;
-                        this.setState({
-                            flag:response.data.code==0?true:false
-                        })
+            Alert.alert('查房','确定查房吗?',
+                [
+                    {text:"取消", onPress:this.cancelSelecte},
+                    {text:"确认", onPress:()=>{this.walletSelected(data)}}
+                ],
+                { cancelable: false }
+            );
 
 
 
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
-            })
+
+
+
 
 
         }
@@ -474,7 +492,7 @@ class Mine extends React.Component {
 
     render(){
 
-        let {pics,picsIndex,flag,electricityMoney,waterMoney,hotWaterMoney,handelMsg,changeMsg,data,menterData,roomInfo} = this.state;
+        let {pics,picsIndex,roomNo,electricityMoney,waterMoney,hotWaterMoney,handelMsg,changeMsg,data,menterData,roomInfo} = this.state;
 
         //弹框
         let modalBackgroundStyle = {
@@ -792,6 +810,7 @@ class Mine extends React.Component {
                                             <TextInput
                                                 placeholder="房间号"
                                                 style={{minWidth:180,padding: 8,}}
+                                                value={roomNo}
                                                 underlineColorAndroid="transparent"
                                                 onChangeText={(roomNo) => this.setState({roomNo})}
                                             >
@@ -992,33 +1011,16 @@ class Mine extends React.Component {
                                 <View style={{alignItems:'center',marginTop:20}}>
 
 
-                                    {
-                                        flag?
-
-                                            <LinearGradient colors={['#fff', '#fff']} style={{width:100,borderRadius:5,borderColor:"#f0f0f0",borderWidth:1}}>
-                                                <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
-                                                    alignItems:"center"
-                                                }} onPress={this.noRepeat }>
-                                                    <Text
-                                                        style={{fontSize:16,textAlign:"center",color:"#000"}}>
-                                                        确定
-                                                    </Text>
-                                                </TouchableHighlight>
-                                            </LinearGradient>
-
-                                            :
-
-                                            <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
-                                                <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
-                                                    alignItems:"center"
-                                                }} onPress={this.submitAll }>
-                                                    <Text
-                                                        style={{fontSize:16,textAlign:"center",color:"#fff"}}>
-                                                        保存
-                                                    </Text>
-                                                </TouchableHighlight>
-                                            </LinearGradient>
-                                    }
+                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                            alignItems:"center"
+                                        }} onPress={this.submitAll }>
+                                            <Text
+                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                保存
+                                            </Text>
+                                        </TouchableHighlight>
+                                    </LinearGradient>
 
                                 </View>
 

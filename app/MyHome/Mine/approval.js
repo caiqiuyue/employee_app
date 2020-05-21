@@ -1067,7 +1067,7 @@ class Mine extends React.Component {
                                     modal=='添加审批'?
                                         <View>
                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
-                                                <View style={{padding:10,paddingBottom:piker1Val[0]=="approval_rent_policy"?200:10}}>
+                                                <View style={{padding:10,paddingBottom:(sortTradeData&&sortTradeData.length>3)?10:200}}>
                                                     <View style={styles.a}>
                                                         <Text style={{flex:1}}>大类:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
@@ -1272,7 +1272,8 @@ class Mine extends React.Component {
                                             </View>
 
                                         </View>:
-                                        modal=='违约退房'?<View>
+                                        modal=='违约退房'?
+                                            <View>
 
 
                                                 <View style={{marginTop:10,borderTopColor:"#7ebef9",borderTopWidth:1,flexDirection:"row",justifyContent:"space-around"}}>

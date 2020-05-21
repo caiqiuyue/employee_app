@@ -242,7 +242,7 @@ class A extends Component {
 
 
     componentWillMount(){
-        console.log(DeviceInfo.getVersion());
+        // console.log(DeviceInfo.getVersion());
 
         // alert('1234qw');
         // if(Platform.OS!== 'android'){
@@ -1207,7 +1207,7 @@ class A extends Component {
 
                                                     <View style={{flexDirection:"row",marginTop:20,marginBottom:20}}>
                                                         <Text style={{fontSize:20}}>精装单间</Text>
-                                                        <Text  style={{marginLeft:30}}>{userData.checkinState==1?`已入住${userData.actDays}天`:`已空置${userData.actDays}天`}</Text>
+                                                        <Text  style={{marginLeft:30}}>{userData.checkinState==1?`已入住${userData.actDays}天`:`已空置${userData.vacancyDays}天`}</Text>
                                                     </View>
 
                                                 </View>
