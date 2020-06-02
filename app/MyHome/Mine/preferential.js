@@ -1,16 +1,33 @@
 import React,{Component} from 'react';
-import {FlatList,View,Alert, ScrollView,Text, TouchableHighlight, TextInput,Image, ImageBackground, StyleSheet,Platform} from 'react-native';
+import {
+    FlatList,
+    View,
+    Alert,
+    ScrollView,
+    Text,
+    TouchableHighlight,
+    TextInput,
+    Image,
+    ImageBackground,
+    StyleSheet,
+    Platform,
+    Modal
+} from 'react-native';
 
 import Dimensions from "Dimensions";
 import coupons from "./style/coupons.png";
 import select from "./style/select.png";
 import axios from "../../axios";
-import {Toast} from "antd-mobile";
+import {DatePicker, Picker, Toast} from "antd-mobile";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {setHotelNo} from "../../components/active/reducer";
 
 import LinearGradient from 'react-native-linear-gradient';
+import moment from "moment";
+import close from "../HomePage/style/close.png";
+import selectIcon from "../HomePage/style/selectIcon.png";
+import shaixuan from "../HomePage/style/shaixuan.png";
 class Mine extends React.Component {
     constructor(props) {
         super(props);
@@ -19,6 +36,8 @@ class Mine extends React.Component {
             amount:null,
             phone:null,
             confId:null,
+            modalName:null,
+            phoneNo:'',
             handelMsg:[
                 {
                     value:"发放",
@@ -42,6 +61,11 @@ class Mine extends React.Component {
             flag:false,
             couponPage:1,
             padd:100,
+            verifyData:{},
+            policyList:[],
+            animationType: 'none',//none slide fade
+            modalVisible: false,//模态场景是否可见
+            transparent: true,//是否透明显示
         }
 
         this.hotelName = ''
@@ -210,34 +234,42 @@ class Mine extends React.Component {
 
     //获取优惠券历史
     getCouponHistory=()=>{
-        axios.post(`/coupon/getCouponHistory`, {
-            page:1,
-            hotelNo:this.props.reduxData.hotelNo
-        })
-            .then((response) =>{
-                console.log(response,'优惠券历史');
-                this.setState({
-                    bb:true
-                },()=>{
-                    if(response.data.code==0){
-                        if(response.data.data&&response.data.data.length>0){
-                            this.setState({
-                                couponList:response.data.data
-                            })
+        this.setState({modalVisible:false},()=>{
+            Toast.loading('loading')
+            axios.post(`/coupon/getCouponHistory`, {
+                page:1,
+                phoneNo:this.state.phoneNo,
+                hotelNo:this.props.reduxData.hotelNo
+            })
+                .then((response) =>{
+                    Toast.hide()
+                    console.log(response,'优惠券历史');
+                    this.setState({
+                        bb:true
+                    },()=>{
+
+                        if(response.data.code==0){
+                            if(response.data.data&&response.data.data.length>0){
+                                this.setState({
+                                    couponList:response.data.data
+                                })
+                            }
+
+
+                        }else{
+                            Toast.info(response.data.message,1)
                         }
+                    })
 
 
-                    }else{
-                        Toast.info(response.data.message,1)
-                    }
+
                 })
+                .catch(function (error) {
+                    console.log(error);
+                })
+        })
 
 
-
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
     }
 
 
@@ -279,36 +311,54 @@ class Mine extends React.Component {
 
     cancelSelected = ()=>{}
 
-    walletSelected=()=>{
+    walletSelected=(f)=>{
 
         Toast.loading('loading')
-        let {confId,amount,phone,couponsData} = this.state;
-        axios.post(`/coupon/grantCoupon`, {
+
+        let {policyList,confId,amount,phone,couponsData} = this.state;
+        let data = {
             phoneNo:phone,
             confId:confId,
             couponCount:amount,
             hotelNo:this.props.reduxData.hotelNo
 
-        })
-            .then((response) =>{
-                Toast.hide()
-                console.log(response,'确认发放优惠券');
+        }
+        let ab = policyList.filter(item=>{return item.flag})
+
+        if(!f){
+            if(ab.length==0){
+               alert('请选择租金方案')
+               return
+            }
+
+            data.policyId = ab[0].policyId
+            data.policyType = ab[0].type
+
+        }
+
+        this.setState({modalVisible:false},()=>{
+            axios.post(`/coupon/grantCoupon`, data)
+                .then((response) =>{
+                    Toast.hide()
+                    console.log(response,'确认发放优惠券');
 
 
-                this.setState({
-                    flag:response.data.code==0?true:false
-                });
+                    this.setState({
+                        flag:response.data.code==0?true:false
+                    });
 
-                Toast.info(response.data.code==0?'发放优惠券成功':response.data.message,1);
+                    Toast.info(response.data.code==0?'发放优惠券成功':response.data.message,1);
 
 
-            })
-            .catch((error)=> {
-                console.log(error);
-                this.setState({
-                    flag:false
                 })
-            })
+                .catch((error)=> {
+                    console.log(error);
+                    this.setState({
+                        flag:false
+                    })
+                })
+        })
+
     }
     //发放优惠券
     submitBtn=()=>{
@@ -339,14 +389,99 @@ class Mine extends React.Component {
             return
         }
 
+        let aa = couponsData.filter(item=>{return item.confId==confId})
+        if(aa[0].discount==1){
+            axios.post(`/coupon/phonePolicy`, {
+                phoneNo:phone,
+                hotelNo:this.props.reduxData.hotelNo
 
-        Alert.alert('确认',`确认发送${amount}张吗`,
-            [
-                {text:"取消", onPress:this.cancelSelected},
-                {text:"确认", onPress:this.walletSelected}
-            ],
-            { cancelable: false }
-        );
+            })
+                .then((response) =>{
+
+                    console.log(response,'租金方案');
+
+                    if(response.data.code==0){
+                        this.setState({policyList:response.data.policyList,modalVisible:true,modalName:'租金方案'})
+
+
+                    }else {
+                        Toast.info(response.data.message,1);
+
+                    }
+
+
+
+
+
+                })
+                .catch((error)=> {
+                    console.log(error);
+                    this.setState({
+                        flag:false
+                    })
+                })
+
+
+        }else {
+            Alert.alert('确认',`确认发送${amount}张吗`,
+                [
+                    {text:"取消", onPress:this.cancelSelected},
+                    {text:"确认", onPress:()=>{this.walletSelected(true)}}
+                ],
+                { cancelable: false }
+            );
+        }
+
+
+
+
+    }
+
+
+
+    verifyCoupon=()=>{
+        let {phone,} = this.state;
+
+
+        if(phone==null||phone.trim()==''){
+            Toast.info('请填写手机号码',1);
+            return
+        }
+
+        if(phone.trim().length<11){
+            Toast.info('请填写正确的手机号码',1);
+            return
+        }
+
+        axios.post(`/coupon/verifyCoupon`, {
+            phoneNo:phone,
+            hotelNo:this.props.reduxData.hotelNo
+
+        })
+            .then((response) =>{
+
+                console.log(response,'验证');
+
+                if(response.data.code==0){
+                    this.setState({ verifyData:response.data})
+
+                }else {
+                    Toast.info(response.data.message,1);
+                    this.setState({ verifyData:{}})
+                }
+
+
+
+
+
+            })
+            .catch((error)=> {
+                console.log(error);
+                this.setState({
+                    flag:false
+                })
+            })
+
 
     }
 
@@ -360,6 +495,15 @@ class Mine extends React.Component {
 
     noRepeat=()=>{
         Toast.info('已发送，不可重复发送',1);
+    }
+
+    screening = ()=>{
+        this.setState({
+            modalVisible: true,
+            modalName:'筛选',
+            phoneNo:'',
+
+        })
     }
 
 
@@ -397,12 +541,42 @@ class Mine extends React.Component {
         );
     }
 
+    _setModalVisible = (visible) => {
+        this.setState({ modalVisible: visible });
+    };
+
+    chooseR=(_item)=>{
+        let {policyList } = this.state
+        policyList.map(item=>{
+         if(item.policyId==_item.policyId){
+            item.flag = !item.flag
+         }else {
+             item.flag=false
+         }
+        })
+
+        this.setState({policyList})
+
+
+    }
+
 
 
 
     render(){
 
-        let {couponsData,handelMsg,changeMsg,refreshing,couponList} = this.state;
+
+        //弹框
+        let modalBackgroundStyle = {
+            backgroundColor: this.state.transparent ? 'rgba(0, 0, 0, 0.5)' : 'red',
+        };
+        let innerContainerTransparentStyle = this.state.transparent
+            ? { backgroundColor: '#fff', padding: 10 ,
+                // height:"90%",
+                overflow:"hidden"}
+            : null;
+
+        let {modalName,policyList,verifyData,couponsData,handelMsg,changeMsg,refreshing,couponList} = this.state;
 
         return (
 
@@ -426,6 +600,109 @@ class Mine extends React.Component {
                         )
                     }
                 </View>
+
+                <Modal
+                    animationType={this.state.animationType}
+                    transparent={this.state.transparent}
+                    visible={this.state.modalVisible}
+
+                    onRequestClose={() => { this._setModalVisible(false) } }
+
+                >
+                    <View style={[styles.container,modalBackgroundStyle]}>
+                        <View style={[styles.innerContainer,innerContainerTransparentStyle]}>
+
+                            <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
+
+                                <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{modalName}</Text></View>
+
+                                <TouchableHighlight underlayColor={"#fff"} onPress={this._setModalVisible.bind(this,false) } style={{}}>
+                                    <Image style={{height:30,width:30}} source={close}/>
+                                </TouchableHighlight>
+
+
+                            </View>
+
+                            {
+                                modalName=='筛选'?
+                                    <View style={{padding:10}}>
+
+                                        <View style={styles.a}>
+                                            <Text style={{flex:1}}>手机号:</Text>
+                                            <View style={[styles.b,{flex:3}]}>
+                                                <TextInput
+                                                    placeholder={"手机号"}
+                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                    underlineColorAndroid="transparent"
+                                                    onChangeText={(phoneNo) => this.setState({phoneNo})}
+                                                >
+                                                </TextInput>
+                                            </View>
+                                        </View>
+                                        <View style={{alignItems:"center",marginTop:10}}>
+                                            <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                    alignItems:"center"
+                                                }} onPress={()=>{this.getCouponHistory()} }>
+                                                    <Text
+                                                        style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                        确定
+                                                    </Text>
+                                                </TouchableHighlight>
+                                            </LinearGradient>
+                                        </View>
+                                    </View>:
+                                    <View>
+                                        <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+                                            <View style={{padding:10}}>
+
+                                                {
+                                                    policyList.length>0&& policyList.map((item,index)=>
+                                                        <TouchableHighlight key={index} underlayColor="transparent"  onPress={()=>{this.chooseR(item)}}>
+                                                            <View style={[styles.a,{backgroundColor:item.flag?"#00adfb":"#fff",padding:5}]}>
+                                                                <Text style={{flex:1}}>{item.type==1?"在住":item.type==2?"系统":'预定'}方案:</Text>
+                                                                <Text style={{flex:2}}>{item.rentPrice}元/月</Text>
+                                                                <View style={{flex:1}}>
+                                                                    {
+                                                                        !item.flag?
+                                                                            <View style={{width:20,height:20,borderColor:"#ccc",backgroundColor:"#fff",borderWidth:1,borderRadius:11}}></View>
+                                                                            :
+
+                                                                            <Image style={{width:16,height:16}} source={select}/>}
+                                                                </View>
+                                                            </View>
+
+                                                        </TouchableHighlight>)
+                                                }
+
+                                            </View>
+                                        </ScrollView>
+
+                                        <View style={{alignItems:"center",marginTop:10}}>
+                                            <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                    alignItems:"center"
+                                                }} onPress={()=>{this.walletSelected(false)} }>
+                                                    <Text
+                                                        style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                        确定
+                                                    </Text>
+                                                </TouchableHighlight>
+                                            </LinearGradient>
+                                        </View>
+                                    </View>
+                            }
+
+
+
+
+
+
+
+
+                        </View>
+                    </View>
+                </Modal>
 
 
                 {
@@ -506,7 +783,7 @@ class Mine extends React.Component {
                                                     onFocus={this.focus}
                                                     style={{minWidth:180,padding: 0}}
                                                     underlineColorAndroid="transparent"
-                                                    onChangeText={(phone) => this.setState({phone,flag:false})}
+                                                    onChangeText={(phone) => this.setState({phone,flag:false,verifyData:{}})}
                                                 >
                                                 </TextInput>
                                             </View>
@@ -516,6 +793,35 @@ class Mine extends React.Component {
 
 
                                     </View>
+
+                                    {
+                                        verifyData.roomNo?
+                                            <View style={{marginTop:20}}>
+                                                <View  style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{flex:1}}>房间号:</Text>
+                                                    <Text style={{flex:3}}>{verifyData.roomNo}</Text>
+                                                </View>
+                                                <View  style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{flex:1}}>类型:</Text>
+                                                    <Text style={{flex:3}}>{verifyData.type}</Text>
+                                                </View>
+                                                <View  style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{flex:1}}>价格:</Text>
+                                                    <Text style={{flex:3}}>{verifyData.rentPrice}元/月</Text>
+                                                </View>
+                                                <View  style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{flex:1}}>租期:</Text>
+                                                    <Text style={{flex:3}}>{verifyData.rentPeriod}个月</Text>
+                                                </View>
+                                                <View  style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{flex:1}}>起租期:</Text>
+                                                    <Text style={{flex:3}}>{verifyData.checkinDate&&moment(verifyData.checkinDate).format("YYYY-MM-DD")}</Text>
+                                                </View>
+
+                                            </View>:null
+                                    }
+
+
 
                                     <View style={{alignItems:"center",marginTop:30}}>
 
@@ -536,16 +842,30 @@ class Mine extends React.Component {
 
                                                 :
 
-                                                <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
-                                                    <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
-                                                        alignItems:"center"
-                                                    }} onPress={this.submitBtn }>
-                                                        <Text
-                                                            style={{fontSize:16,textAlign:"center",color:"#fff"}}>
-                                                            确定
-                                                        </Text>
-                                                    </TouchableHighlight>
-                                                </LinearGradient>
+                                                <View style={{flexDirection:"row",justifyContent:"space-around",width:"100%"}}>
+                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                            alignItems:"center"
+                                                        }} onPress={this.verifyCoupon }>
+                                                            <Text
+                                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                验证
+                                                            </Text>
+                                                        </TouchableHighlight>
+                                                    </LinearGradient>
+                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                            alignItems:"center"
+                                                        }} onPress={this.submitBtn }>
+                                                            <Text
+                                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                确定
+                                                            </Text>
+                                                        </TouchableHighlight>
+                                                    </LinearGradient>
+                                                </View>
+
+
                                         }
 
 
@@ -562,65 +882,75 @@ class Mine extends React.Component {
                             </View>)
 
                             :
-                    <View style={{
-                        ...Platform.select({
-                            android:{
-                                paddingBottom:120,
-                            },
-                            ios:{
-                                paddingBottom:100,
-                            }
-                        }),
-                    }}>
 
-                        <FlatList
-                            data={couponList}  //列表的渲染数据源
-                            getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
-                            initialNumToRender={10}  //首次渲染的条数
-                            ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.bb?'暂无发放记录':'查询发放记录中'}</Text></View>}
-                            onEndReached={()=>{this.onEndReached()}}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
-                            onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
-                            onRefresh={()=>{this.onRefresh()}} //下拉刷新
-                            refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
-                            keyExtractor={(item,index)=>`${index}`}
-                            renderItem={({item,index})=>(
-                                <View key={index}  style={[styles.d,styles.e,]}>
+                        <View>
+                            <View style={{flexDirection:"row-reverse",margin:10}}>
+                                <TouchableHighlight underlayColor="transparent" onPress={this.screening}>
+                                    <View><Image style={{height:25,width:25}} source={shaixuan}/></View>
+                                </TouchableHighlight>
+                            </View>
 
-                                    <View  style={[styles.aaa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
-                                        <Text style={{fontSize:18,fontWeight:"bold"}}>{item.couponMoney}元</Text>
-                                        <Text style={{marginTop:5,color:"grey"}}>{item.createTime}</Text>
-                                    </View>
+                            <View style={{
+                                ...Platform.select({
+                                    android:{
+                                        paddingBottom:215,
+                                    },
+                                    ios:{
+                                        paddingBottom:195,
+                                    }
+                                }),
+                            }}>
 
-                                    <View style={[styles.aaa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
-                                        <Text>{item.couponName}</Text>
-                                        <Text  style={{marginTop:5,}}><Text style={{fontSize:18,fontWeight:"bold"}}>{item.couponCount}</Text>张</Text>
-                                    </View>
+                                <FlatList
+                                    data={couponList}  //列表的渲染数据源
+                                    getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
+                                    initialNumToRender={10}  //首次渲染的条数
+                                    ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.bb?'暂无发放记录':'查询发放记录中'}</Text></View>}
+                                    onEndReached={()=>{this.onEndReached()}}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
+                                    onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
+                                    onRefresh={()=>{this.onRefresh()}} //下拉刷新
+                                    refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
+                                    keyExtractor={(item,index)=>`${index}`}
+                                    renderItem={({item,index})=>(
+                                        <View key={index}  style={[styles.d,styles.e,]}>
+
+                                            <View  style={[styles.aaa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
+                                                <Text style={{fontSize:18,fontWeight:"bold"}}>{item.couponMoney}元</Text>
+                                                <Text style={{marginTop:5,color:"grey"}}>{item.createTime}</Text>
+                                            </View>
+
+                                            <View style={[styles.aaa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
+                                                <Text>{item.couponName}</Text>
+                                                <Text  style={{marginTop:5,}}><Text style={{fontSize:18,fontWeight:"bold"}}>{item.couponCount}</Text>张</Text>
+                                            </View>
 
 
-                                    <View style={[styles.aaa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
-                                        <Text  style={{color:"grey"}}>{item.phoneNo}</Text>
-                                        <Text  style={{marginTop:5}}> 发放人:<Text  style={{fontWeight:"bold"}}>{item.sendName}</Text></Text>
-                                    </View>
+                                            <View style={[styles.aaa,{flex:3,alignItems:"center",justifyContent:"center"}]}>
+                                                <Text  style={{color:"grey"}}>{item.phoneNo}</Text>
+                                                <Text  style={{marginTop:5}}> 发放人:<Text  style={{fontWeight:"bold"}}>{item.sendName}</Text></Text>
+                                            </View>
 
 
-                                    <View style={[styles.aaa,{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                        <Text>已使用</Text>
-                                        <Text  style={{marginTop:5}}><Text style={{fontSize:18,fontWeight:"bold"}}>{item.useCount}</Text>张</Text>
+                                            <View style={[styles.aaa,{flex:2,alignItems:"center",justifyContent:"center"}]}>
+                                                <Text>已使用</Text>
+                                                <Text  style={{marginTop:5}}><Text style={{fontSize:18,fontWeight:"bold"}}>{item.useCount}</Text>张</Text>
 
-                                        {!item.useCount&&<Text onPress={()=>{this.deleteCoupons(item)}} style={{marginTop:5,fontWeight:"bold",color:"red"}}>删除</Text>
-                                        }
+                                                {!item.useCount&&<Text onPress={()=>{this.deleteCoupons(item)}} style={{marginTop:5,fontWeight:"bold",color:"red"}}>删除</Text>
+                                                }
+                                            </View>
+
+
+
+
                                         </View>
+                                    )}
+
+                                />
 
 
+                            </View>
+                        </View>
 
-
-                                </View>
-                            )}
-
-                        />
-
-
-                    </View>
                 }
 
 
@@ -639,6 +969,15 @@ class Mine extends React.Component {
 
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 20,
+
+    },
+    innerContainer: {
+        borderRadius: 10,
+    },
 
     a:{
         flexDirection:"row",alignItems:"center",marginTop:10

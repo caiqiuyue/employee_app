@@ -282,17 +282,22 @@ const RoomInfo = props => {
 
     }
 
-     componentWillReceiveProps(){
+     componentWillReceiveProps(nextProps, nextContext) {
+         console.log(this.props);
+         console.log(nextProps,'nextProps');
+         console.log('componentWillReceiveProps')
+         if(this.props.reduxData.hotelNo !== nextProps.reduxData.hotelNo){
+             this.setState({
+                 refreshing:true
+             },()=>{
+                 this.getAll()
+             })
+             this.getSalesmanList();
+             this.getTakerTakermanList();
+         }
 
-         this.setState({
-             refreshing:true
-         },()=>{
-             this.getAll()
-         })
 
 
-        this.getSalesmanList();
-        this.getTakerTakermanList();
     }
 
 

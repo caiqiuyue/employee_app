@@ -97,13 +97,19 @@ class GoodSelect extends Component {
 
     }
 
-    componentWillReceiveProps(){
+    componentWillReceiveProps(nextProps, nextContext) {
+        console.log(this.props);
+        console.log(nextProps,'nextProps');
+        console.log('componentWillReceiveProps')
+        if(this.props.reduxData.hotelNo !== nextProps.reduxData.hotelNo){
+            this.setState({
+                refreshing:true
+            },()=>{
+                this.getAll()
+            })
+        }
 
-        this.setState({
-            refreshing:true
-        },()=>{
-            this.getAll()
-        })
+
 
 
         let {handelMsg} = this.state;
@@ -447,7 +453,7 @@ class GoodSelect extends Component {
         if(date==null){
             alert('请选择上门日期');
         }else {
-            
+
             console.log(date,'date');
             this.setState({
                 modalVisible: false
@@ -474,7 +480,7 @@ class GoodSelect extends Component {
                         console.log(error);
                     })
             })
-            
+
 
         }
 

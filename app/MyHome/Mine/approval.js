@@ -647,21 +647,25 @@ class Mine extends React.Component {
     }
 
     getPickerData = (data) => {
-        let piker1 = []
-        data.map(item=>{
-            let a = {
-                value:item.dicKey,
-                label:item.dicValue
-            }
-            piker1.push(a)
-        })
-        this.setState({
-            piker1,
-            piker1Val:[piker1[0].value],
 
-        },()=>{
-            this.getPicker2Data(data,this.state.piker1Val)
-        })
+        let piker1 = []
+        if(data.length>0){
+            data.map(item=>{
+                let a = {
+                    value:item.dicKey,
+                    label:item.dicValue
+                }
+                piker1.push(a)
+            })
+            this.setState({
+                piker1,
+                piker1Val:[piker1[0].value],
+
+            },()=>{
+                this.getPicker2Data(data,this.state.piker1Val)
+            })
+        }
+
     }
 
 

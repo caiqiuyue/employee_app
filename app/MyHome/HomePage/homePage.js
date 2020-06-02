@@ -1326,7 +1326,7 @@ class A extends Component {
 
                                                                 {(item.orderState==1&&item.tradeType==3)?<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen} style={{height:20,width:20}}/></View>:null}
                                                                 {(item.orderState==1&&item.tradeType==4)?<View style={{position:"absolute",zIndex:999,top:3,right:3}}><Image source={zhen2} style={{height:20,width:20}}/></View>:null}
-                                                                {item.repairState==0&&<View style={{position:"absolute",zIndex:999,top:16,right:3}}><Text style={{color:"red"}}>维修</Text></View>}
+                                                                {item.repairState==0?<View style={{position:"absolute",zIndex:999,top:16,right:3}}><Text style={{color:"red"}}>维修</Text></View>:null}
 
 
 
@@ -1335,7 +1335,7 @@ class A extends Component {
                                                                     alignItems: 'center', justifyContent: 'center' ,
                                                                 }}>
                                                                     {item.customerName?<View><Text style={{color:item.checkinState==1?"#fff":"#0074c3",marginTop:5,fontWeight:"bold"}}>{item.customerName}</Text></View>:null}
-                                                                    {item.enableState==0&&<View style={{}}><Image style={{width:25,height:25}} source={stop}/></View>}
+                                                                    {item.enableState==0?<View style={{}}><Image style={{width:25,height:25}} source={stop}/></View>:null}
                                                                     <View><Text  style={{color:item.checkinState==1?"#fff":"#0074c3",paddingTop:5,fontWeight:"bold"}} >{item.roomNo}</Text></View>
 
 

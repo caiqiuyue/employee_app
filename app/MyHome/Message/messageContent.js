@@ -68,7 +68,8 @@ class ReadMessage extends React.Component {
             changeMsg:"未读消息",
             unreadData:[],
             readData:[],
-            aa:false
+            aa:false,
+            page:1
         };
 
         this.type = 1
@@ -83,6 +84,7 @@ class ReadMessage extends React.Component {
         }
 
         axios.post(`/empMsg/getMyMsg`, {
+            page:1
         })
             .then( (response)=> {
                 console.log(response,'componentWillMount获取消息');
@@ -167,14 +169,25 @@ class ReadMessage extends React.Component {
         })
             .then( (response)=> {
                 console.log(response);
-                this.getMyMsg()
+                this.setState({page:1},()=>{
+                    this.getMyMsg()
+                })
+
             })
             .catch(function (error) {
                 console.log(error);
             });
     };
 
+    onEndReached=()=>{
+        this.setState({page:this.state.page+1},()=>{
+            this.getMyMsg()
+        })
+    }
+
     getMyMsg=()=>{
+
+        let {page,unreadData,readData} = this.state
 
 
         this.setState({
@@ -182,6 +195,7 @@ class ReadMessage extends React.Component {
         })
 
         axios.post(`/empMsg/getMyMsg`, {
+            page
         })
             .then( (response)=> {
                 console.log(response,'获取消息');
@@ -193,10 +207,10 @@ class ReadMessage extends React.Component {
                     this.props.getData(unread);
 
                     this.setState({
-                        unreadData:response.data.unreadList&&response.data.unreadList,
-                        readData:response.data.readList&&response.data.readList
+                        unreadData:page==1?response.data.unreadList:[...unreadData,...response.data.unreadList,],
+                        readData:page==1?response.data.readList:[...readData,...response.data.readList,]
                     })
-                }else if(response.data.code==1){
+                }else{
                     Toast.info(response.data.message,1)
                 }
 
@@ -210,13 +224,13 @@ class ReadMessage extends React.Component {
     onRefresh = () => {
 
         this.setState({
-            refreshing: true
+            refreshing: true,page:1
         },()=>{
            this.getMyMsg()
         });
 
 
-        
+
 
     };
 
@@ -290,7 +304,7 @@ class ReadMessage extends React.Component {
                                     ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.aa?'暂无未读消息':'获取消息数据中'}</Text></View>} //列表没有数据时展示，箭头函数中可以写一个react组件
                                     getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
                                     initialNumToRender={10}  //首次渲染的条数
-                                    // onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
+                                    onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
                                     onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
                                     onRefresh={this.onRefresh} //下拉刷新
                                     refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
@@ -342,7 +356,7 @@ class ReadMessage extends React.Component {
                                     ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.aa?'暂无已读消息':'获取消息数据中'}</Text></View>} //列表没有数据时展示，箭头函数中可以写一个react组件
                                     getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
                                     initialNumToRender={10}  //首次渲染的条数
-                                    // onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
+                                    onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
                                     onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
                                     onRefresh={this.onRefresh} //下拉刷新
                                     refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
