@@ -115,7 +115,7 @@ class Mine extends React.Component {
     //上拉加载
     onEndReached=()=>{
 
-        let {couponPage,couponList} = this.state
+        let {couponPage,couponList,phoneNo} = this.state
 
         this.setState({
             couponPage:couponPage+1
@@ -124,7 +124,8 @@ class Mine extends React.Component {
 
             axios.post(`/coupon/getCouponHistory`, {
                 page:this.state.couponPage,
-                hotelNo:this.props.reduxData.hotelNo
+                hotelNo:this.props.reduxData.hotelNo,
+                phoneNo
             })
                 .then((response) =>{
                     console.log(response,'优惠券历史上拉加载');
@@ -151,7 +152,10 @@ class Mine extends React.Component {
 
 
     onRefresh=()=>{
-        this.getCouponHistory()
+        this.setState({page:1,phoneNo:''},()=>{
+            this.getCouponHistory()
+        })
+
     }
 
 

@@ -270,6 +270,7 @@ const RoomInfo = props => {
 
         this.rentPolicyArr = [];
         this.disabled=false;
+        this.time=null;
     }
 
 
@@ -2687,7 +2688,13 @@ const RoomInfo = props => {
                                                                     // value={this.state.username}
                                                                     style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
-                                                                    onChangeText={(name) => this.setState({cardCode:name})}
+                                                                    onChangeText={(name) => this.setState({cardCode:name},()=>{
+                                                                        clearTimeout(this.time);
+                                                                        this.time = setTimeout(() => {
+                                                                            let a = name&&name.substring(0,2)
+                                                                            alert(`该身份证归属省为${city[a-0]}`)
+                                                                        }, 1000);
+                                                                    })}
                                                                 >
                                                                 </TextInput>
                                                             </View>
@@ -3252,7 +3259,14 @@ const RoomInfo = props => {
                                                                     // value={this.state.username}
                                                                     style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                     underlineColorAndroid="transparent"
-                                                                    onChangeText={(name) => this.setState({cardCode:name})}
+                                                                    // onChangeText={(name) => this.setState({cardCode:name})}
+                                                                    onChangeText={(name) => this.setState({cardCode:name},()=>{
+                                                                        clearTimeout(this.time);
+                                                                        this.time = setTimeout(() => {
+                                                                            let a = name&&name.substring(0,2)
+                                                                            alert(`该身份证归属省为${city[a-0]}`)
+                                                                        }, 1000);
+                                                                    })}
                                                                 >
                                                                 </TextInput>
                                                             </View>
@@ -3500,7 +3514,14 @@ const RoomInfo = props => {
                                                                         // value={this.state.username}
                                                                         style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
                                                                         underlineColorAndroid="transparent"
-                                                                        onChangeText={(name) => this.setState({cardCode2:name})}
+                                                                        // onChangeText={(name) => this.setState({cardCode2:name})}
+                                                                        onChangeText={(name) => this.setState({cardCode2:name},()=>{
+                                                                            clearTimeout(this.time);
+                                                                            this.time = setTimeout(() => {
+                                                                                let a = name&&name.substring(0,2)
+                                                                                alert(`该身份证归属省为${city[a-0]}`)
+                                                                            }, 1000);
+                                                                        })}
                                                                     >
                                                                     </TextInput>
                                                                 </View>

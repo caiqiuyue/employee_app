@@ -6,7 +6,7 @@ import {
 import callIcon from '../HomePage/style/60.png'
 import Dimensions from "Dimensions";
 import axios from "../../axios";
-import {Carousel,Toast,Picker} from 'antd-mobile'
+import {Carousel, Toast, Picker, DatePicker} from 'antd-mobile'
 import shaixuan from "../HomePage/style/shaixuan.png";
 import s1 from "../HomePage/style/sanjiao.png";
 import close from "../HomePage/style/close.png";
@@ -280,7 +280,10 @@ class Mine extends React.Component {
             AllAnnal:[],
             rentPeriod:[],
             rentPrice:'',
-            pledge:[],
+            screenRoomNo:'',
+            operationTime:'',
+            completeTime:'',
+            pledge:['1'],
             payMonth:[],
             sortTradeData:null,
             piker1:[],
@@ -537,7 +540,7 @@ class Mine extends React.Component {
             sortTradeData:null,
             rentPeriod:[],
             rentPrice:'',
-            pledge:[],
+            pledge:['1'],
             payMonth:[],
             modalVisible:true
         },()=>{
@@ -702,15 +705,21 @@ class Mine extends React.Component {
     }
 
     queryAllAnnal = ()=>{
+        let {screenRoomNo,operationTime,completeTime} = this.state
+
+
         axios.post(`/approval/queryAllAnnal`, {
             hotelNo:this.props.reduxData.hotelNo,
-            page:1
+            page:1,
+            roomNo:screenRoomNo,
+            operationTime:operationTime?moment(operationTime).format("YYYY-MM-DD"):'',
+            completeTime:completeTime?moment(completeTime).format("YYYY-MM-DD"):''
         })
             .then((response) =>{
                 console.log(response,'已完成');
                 if(response.data.code==0){
                     this.setState({
-                        AllAnnal:response.data.data,
+                        AllAnnal:response.data.data,modalVisible:false
                         })
                 }else {
                     Toast.info(response.data.message)
@@ -1000,6 +1009,17 @@ class Mine extends React.Component {
         this.setState({ modalVisible: visible });
     };
 
+    screening = ()=>{
+        this.setState({
+            modalVisible: true,
+            modal:'筛选',
+            screenRoomNo:'',
+            operationTime:'',
+            completeTime:'',
+
+        })
+    }
+
 
     render(){
 
@@ -1016,7 +1036,9 @@ class Mine extends React.Component {
             : null;
 
 
-
+        let maxDate2 = new Date();
+        let minDate1 = moment(new Date()).subtract(3, "year")
+        let minDate = new Date(minDate1)
 
         return (
 
@@ -1411,6 +1433,87 @@ class Mine extends React.Component {
 
                                                 </View>
                                             </View>:
+                                            modal=='筛选'?
+                                                <View>
+
+                                                    <View style={{paddingRight:20}}>
+
+                                                        <View style={styles.a}>
+                                                            <Text style={{flex:1}}>房间号:</Text>
+                                                            <View style={[styles.b,{flex:3}]}>
+                                                                <TextInput
+                                                                    placeholder={"房间号"}
+                                                                    style={{minWidth:'100%',padding:10,borderColor:"#ccc",borderWidth:1,borderRadius:5,}}
+                                                                    underlineColorAndroid="transparent"
+                                                                    onChangeText={(screenRoomNo) => this.setState({screenRoomNo})}
+                                                                >
+                                                                </TextInput>
+                                                            </View>
+                                                        </View>
+
+
+                                                        <View style={styles.a}>
+                                                            <Text style={{flex:1}}>申请日期:</Text>
+                                                            <View style={[styles.b,{flex:3}]}>
+
+                                                                <DatePicker
+                                                                    extra="请选择申请日期"
+                                                                    format={val => moment(val).format("YYYY-MM-DD")}
+                                                                    value={this.state.operationTime}
+                                                                    mode="date"
+                                                                    maxDate={maxDate2}
+                                                                    minDate={minDate}
+                                                                    onOk={operationTime => {this.setState({operationTime})}}
+
+                                                                >
+                                                                    <RoomInfo></RoomInfo>
+                                                                </DatePicker>
+
+
+
+                                                            </View>
+
+                                                        </View>
+
+                                                        <View style={styles.a}>
+                                                            <Text style={{flex:1}}>审批日期:</Text>
+                                                            <View style={[styles.b,{flex:3}]}>
+
+                                                                <DatePicker
+                                                                    extra="请选择审批日期"
+                                                                    format={val => moment(val).format("YYYY-MM-DD")}
+                                                                    value={this.state.completeTime}
+                                                                    mode="date"
+                                                                    maxDate={maxDate2}
+                                                                    minDate={minDate}
+                                                                    onOk={completeTime => {this.setState({completeTime})}}
+
+                                                                >
+                                                                    <RoomInfo></RoomInfo>
+                                                                </DatePicker>
+
+
+
+                                                            </View>
+
+                                                        </View>
+
+
+                                                        <View style={{alignItems:"center",marginTop:10}}>
+                                                            <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                                <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                                                    alignItems:"center"
+                                                                }} onPress={this.queryAllAnnal}>
+                                                                    <Text
+                                                                        style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                                        确定
+                                                                    </Text>
+                                                                </TouchableHighlight>
+                                                            </LinearGradient>
+                                                        </View>
+
+                                                    </View>
+                                                </View>:
                                         <View>
                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
                                                 <View style={{padding:10}}>
@@ -1774,15 +1877,24 @@ class Mine extends React.Component {
 
                         :
                         <View>
+                            <View style={{flexDirection:"row-reverse",margin:10}}>
+                                <TouchableHighlight underlayColor="transparent" onPress={this.screening}>
+                                    <View><Image style={{height:25,width:25}} source={shaixuan}/></View>
+                                </TouchableHighlight>
+                            </View>
+
+
+
                             <View style={{
                                 ...Platform.select({
                                     android:{
-                                        paddingBottom:130,
+                                        paddingBottom:220,
                                     },
                                     ios:{
-                                        paddingBottom:100,
+                                        paddingBottom:200,
                                     }
-                                }),}}>
+                                }),
+                            }}>
 
                                 <View>
                                     <FlatList
