@@ -2693,7 +2693,7 @@ const RoomInfo = props => {
                                                                         this.time = setTimeout(() => {
                                                                             let a = name&&name.substring(0,2)
                                                                             alert(`该身份证归属省为${city[a-0]}`)
-                                                                        }, 1000);
+                                                                        }, 3000);
                                                                     })}
                                                                 >
                                                                 </TextInput>
@@ -3265,7 +3265,7 @@ const RoomInfo = props => {
                                                                         this.time = setTimeout(() => {
                                                                             let a = name&&name.substring(0,2)
                                                                             alert(`该身份证归属省为${city[a-0]}`)
-                                                                        }, 1000);
+                                                                        }, 3000);
                                                                     })}
                                                                 >
                                                                 </TextInput>
@@ -3520,7 +3520,7 @@ const RoomInfo = props => {
                                                                             this.time = setTimeout(() => {
                                                                                 let a = name&&name.substring(0,2)
                                                                                 alert(`该身份证归属省为${city[a-0]}`)
-                                                                            }, 1000);
+                                                                            }, 3000);
                                                                         })}
                                                                     >
                                                                     </TextInput>

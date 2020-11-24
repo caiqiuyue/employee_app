@@ -28,6 +28,18 @@ import moment from "moment";
 import close from "../HomePage/style/close.png";
 import selectIcon from "../HomePage/style/selectIcon.png";
 import shaixuan from "../HomePage/style/shaixuan.png";
+import s1 from "../HomePage/style/sanjiao.png";
+const RoomInfo = props => {
+    return (
+        <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
+
+            <View style={{width:180,flexDirection:"row",borderColor:"#ccc",borderWidth:1,borderRadius:5,overflow:'hidden',padding:10}}>
+                <View style={{flex:3,}}><Text>{props.extra}</Text></View>
+                <View style={{flex:1,alignItems:"center",justifyContent:"center",}}><Image style={{height:10,width:15}} source={s1}/></View>
+            </View>
+        </TouchableHighlight>
+    )
+};
 class Mine extends React.Component {
     constructor(props) {
         super(props);
@@ -38,6 +50,7 @@ class Mine extends React.Component {
             confId:null,
             modalName:null,
             phoneNo:'',
+            validityEnd:'',
             handelMsg:[
                 {
                     value:"发放",
@@ -324,7 +337,8 @@ class Mine extends React.Component {
             phoneNo:phone,
             confId:confId,
             couponCount:amount,
-            hotelNo:this.props.reduxData.hotelNo
+            hotelNo:this.props.reduxData.hotelNo,
+            validityEnd:this.state.validityEnd?moment(this.state.validityEnd).format('YYYY-MM-DD'):''
 
         }
         let ab = policyList.filter(item=>{return item.flag})
@@ -793,9 +807,26 @@ class Mine extends React.Component {
                                             </View>
 
                                         </View>
+                                    </View>
 
+                                    <View  style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                        <Text style={{flex:1}}>截止日期:</Text>
 
+                                        <View style={{flex:3,width:180}}>
+                                            <DatePicker
+                                                extra="请选择截止日期"
+                                                format={val => moment(val).format("YYYY-MM-DD")}
+                                                value={this.state.validityEnd}
+                                                mode="date"
+                                                minDate={new Date()}
+                                                // onChange={date1 => {this.changeDate1(date1)}}
+                                                onOk={validityEnd => {this.setState({validityEnd})}}
+                                                // onOk={date1 => this.setState({date1},()=>{this.getAll()})}
+                                            >
+                                                <RoomInfo></RoomInfo>
+                                            </DatePicker>
 
+                                        </View>
                                     </View>
 
                                     {

@@ -5,7 +5,7 @@ import Dimensions from "Dimensions";
 import axios from "../../axios";
 import {Carousel, DatePicker, Toast} from 'antd-mobile'
 import shaixuan from "../HomePage/style/shaixuan.png";
-import s1 from "../HomePage/style/234.png";
+import s1 from "../HomePage/style/sanjiao.png";
 import close from "../HomePage/style/close.png";
 import selectIcon from '../HomePage/style/selectIcon.png'
 

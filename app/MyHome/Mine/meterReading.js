@@ -442,9 +442,7 @@ class Mine extends React.Component {
                 Toast.info(response.data.code==0?'提交成功':response.data.message,1)
 
                 this.roomNo=this.state.roomNo;
-                this.setState({
-                    flag:response.data.code==0?true:false
-                })
+
 
 
 
@@ -470,19 +468,13 @@ class Mine extends React.Component {
             return
         }else {
 
-            this.setState({
-                flag:true
-            },()=>{
-
-                Alert.alert('确定抄表？','确定抄表',
-                    [
-                        {text:"取消", onPress:this.cancelSelected},
-                        {text:"确认", onPress:this.comfirmSelected}
-                    ],
-                    { cancelable: false }
-                );
-
-            })
+            Alert.alert('确定抄表？','确定抄表',
+                [
+                    {text:"取消", onPress:this.cancelSelected},
+                    {text:"确认", onPress:this.comfirmSelected}
+                ],
+                { cancelable: false }
+            );
 
 
         }
@@ -1128,34 +1120,16 @@ class Mine extends React.Component {
 
                                 <View style={{alignItems:'center',marginTop:20}}>
 
-                                    {
-                                        flag?
-
-                                            <LinearGradient colors={['#fff', '#fff']} style={{width:100,borderRadius:5,borderColor:"#f0f0f0",borderWidth:1}}>
-                                                <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
-                                                    alignItems:"center"
-                                                }} onPress={this.noRepeat }>
-                                                    <Text
-                                                        style={{fontSize:16,textAlign:"center",color:"#000"}}>
-                                                        发送账单
-                                                    </Text>
-                                                </TouchableHighlight>
-                                            </LinearGradient>
-
-                                            :
-
-                                            <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
-                                                <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
-                                                        alignItems:"center"
-                                                    }} onPress={this.submitAll }>
-                                                    <Text
-                                                    style={{fontSize:16,textAlign:"center",color:"#fff"}}>
-                                                        发送账单
-                                                    </Text>
-                                                </TouchableHighlight>
-                                            </LinearGradient>
-                                    }
-
+                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                        <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                            alignItems:"center"
+                                        }} onPress={this.submitAll }>
+                                            <Text
+                                                style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                                发送账单
+                                            </Text>
+                                        </TouchableHighlight>
+                                    </LinearGradient>
 
 
 
