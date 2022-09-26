@@ -17,7 +17,7 @@
     "react-dom": "^16.3.2",
     "react-fastclick": "^3.0.2",
     "react-native": "0.55.4",
-    "react-native-code-push": "^5.3.5",
+    "react-native-code-push": "^5.7.0",
     "react-native-deprecated-custom-components": "^0.1.2",
     "react-native-device-info": "^0.24.3",
     "react-native-fs": "^2.10.14",
